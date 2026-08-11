@@ -1,0 +1,24 @@
+services:
+  app:
+    build: .
+    ports:
+      - "4000:4000"
+    volumes:
+      # Mount workspace so source edits on host are immediately visible in container
+      - .:/app
+      # Named volumes for build artifacts — keeps them inside the container
+      # so they don't pollute the host or cause cross-platform issues
+      - deps:/app/deps
+      - build:/app/_build
+    environment:
+      - MIX_ENV=dev
+      # Bind to all interfaces so the host can reach the dev server
+      - PHX_HOST=localhost
+    # Keep the container running even if the main command fails,
+    # useful during initial setup before the Phoenix project exists
+    stdin_open: true
+    tty: true
+
+volumes:
+  deps:
+  build:
