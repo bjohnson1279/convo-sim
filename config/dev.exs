@@ -64,5 +64,7 @@ config :phoenix_live_view,
   # Enable helpful, but potentially expensive runtime checks
   enable_expensive_runtime_checks: true
 
-# Conversation responder — swap to ConvoSim.Responder.LMStudio for real AI
-config :convo_sim, :responder, ConvoSim.Responder.Simulated
+# Conversation responder — swap back to ConvoSim.Responder.Simulated for offline dev
+config :convo_sim, :responder, ConvoSim.Responder.LMStudio
+config :convo_sim, :lm_studio_url, "http://192.168.0.249:1234"
+config :convo_sim, :lm_studio_model, "qwen2.5-coder-3b-instruct"
