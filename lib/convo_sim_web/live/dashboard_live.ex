@@ -66,7 +66,11 @@ defmodule ConvoSimWeb.DashboardLive do
 
   defp load_conversations do
     ConversationManager.list_conversations()
-    |> Enum.map(&ConversationManager.get_state/1)
+    # ⚡ Bolt: Optimize sequential state fetching by loading in parallel
+    |> Task.async_stream(&ConversationManager.get_state/1,
+      max_concurrency: System.schedulers_online() * 2
+    )
+    |> Enum.map(fn {:ok, state} -> state end)
   end
 
   defp stream_delete_by_id(socket, stream_name, id) do
