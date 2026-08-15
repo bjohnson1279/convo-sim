@@ -4,7 +4,7 @@ import Config
 # you can enable the server option below.
 config :convo_sim, ConvoSimWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "nyCWL1vfqt/O2ofQ/24sdzZXHe7Ec0iD0oCYiHmbai/+4CzklmUy626w+hieye2Q",
+  secret_key_base: System.get_env("SECRET_KEY_BASE") || "a_very_long_dummy_secret_key_base_for_testing_purposes_only_12345678",
   server: false
 
 # Print only warnings and errors during test
