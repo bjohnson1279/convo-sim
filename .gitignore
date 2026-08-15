@@ -35,3 +35,5 @@ convo_sim-*.tar
 npm-debug.log
 /assets/node_modules/
 
+elixir-1.17.2/
+elixir-otp-25.zip
