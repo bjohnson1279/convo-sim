@@ -30,7 +30,7 @@ defmodule ConvoSim.Responder.LMStudio do
     messages = build_messages(history, message)
 
     # Get config — these are set in config/dev.exs
-    base_url = Application.get_env(:convo_sim, :lm_studio_url, "http://192.168.0.249:1234")
+    base_url = Application.get_env(:convo_sim, :lm_studio_url, "http://127.0.0.1:1234")
     model = Application.get_env(:convo_sim, :lm_studio_model, "qwen2.5-coder-3b-instruct")
 
     # Make the API call using Req (the preferred Elixir HTTP client).
