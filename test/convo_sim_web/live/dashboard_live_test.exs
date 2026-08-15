@@ -38,4 +38,17 @@ defmodule ConvoSimWeb.DashboardLiveTest do
 
     ConvoSim.ConversationManager.stop_conversation(id)
   end
+
+  test "loads existing active conversations concurrently on mount", %{conn: conn} do
+    {:ok, id1} = ConvoSim.ConversationManager.start_conversation()
+    {:ok, id2} = ConvoSim.ConversationManager.start_conversation()
+
+    {:ok, view, _html} = live(conn, ~p"/")
+
+    assert has_element?(view, "#conversations-#{id1}")
+    assert has_element?(view, "#conversations-#{id2}")
+
+    ConvoSim.ConversationManager.stop_conversation(id1)
+    ConvoSim.ConversationManager.stop_conversation(id2)
+  end
 end
