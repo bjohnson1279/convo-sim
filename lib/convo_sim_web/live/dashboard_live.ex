@@ -188,7 +188,7 @@ defmodule ConvoSimWeb.DashboardLive do
                 phx-value-id={convo.id}
                 class="py-1.5 px-2.5 bg-red-950/40 hover:bg-red-900/60 text-red-400 text-xs font-medium rounded-lg transition border border-red-900/50 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                 title="Stop Process"
-                aria-label="Stop Process"
+                aria-label="Stop Conversation"
                 data-confirm="Are you sure you want to stop this conversation?"
               >
                 <.icon name="hero-trash" class="w-3.5 h-3.5" />
