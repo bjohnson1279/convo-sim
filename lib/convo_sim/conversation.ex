@@ -58,7 +58,9 @@ defmodule ConvoSim.Conversation do
 
   @impl GenServer
   def handle_call(:get_state, _from, state) do
-    {:reply, state, state}
+    # Reverse messages to maintain chronological order for callers
+    reply_state = %{state | messages: Enum.reverse(state.messages)}
+    {:reply, reply_state, state}
   end
 
   @impl GenServer
@@ -69,7 +71,8 @@ defmodule ConvoSim.Conversation do
       timestamp: DateTime.utc_now()
     }
 
-    new_state = %{state | messages: state.messages ++ [customer_msg], status: :responding}
+    # Prepend instead of append (O(1) instead of O(N))
+    new_state = %{state | messages: [customer_msg | state.messages], status: :responding}
 
     # Broadcast status change
     broadcast_all(new_state)
@@ -80,7 +83,8 @@ defmodule ConvoSim.Conversation do
     pid = self()
 
     Task.start(fn ->
-      response = responder.respond(content, state.messages)
+      # Reverse messages to pass chronological history to the responder
+      response = responder.respond(content, Enum.reverse(state.messages))
       # Send the result back to the GenServer using standard Erlang messaging
       send(pid, {:ai_response, response})
     end)
@@ -96,7 +100,8 @@ defmodule ConvoSim.Conversation do
       timestamp: DateTime.utc_now()
     }
 
-    new_state = %{state | messages: state.messages ++ [ai_msg], status: :idle}
+    # Prepend instead of append (O(1) instead of O(N))
+    new_state = %{state | messages: [ai_msg | state.messages], status: :idle}
 
     broadcast_all(new_state)
 
@@ -106,10 +111,13 @@ defmodule ConvoSim.Conversation do
   # --- Private Helpers ---
 
   defp broadcast_all(state) do
+    # Reverse messages before broadcast so the UI receives them in chronological order
+    broadcast_state = %{state | messages: Enum.reverse(state.messages)}
+
     # Broadcast to global topic
-    broadcast("conversations", state)
+    broadcast("conversations", broadcast_state)
     # Broadcast to per-conversation topic
-    broadcast("conversation:#{state.id}", state)
+    broadcast("conversation:#{broadcast_state.id}", broadcast_state)
   end
 
   defp broadcast(topic, state) do

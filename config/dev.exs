@@ -14,7 +14,9 @@ config :convo_sim, ConvoSimWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "jPIfeHG1wMIC+sp8QnqELZFjNa/dlfMpoM0Cvl2bjzUJ/mveRgbJ0XUpCy0diz4L",
+  secret_key_base:
+    System.get_env("SECRET_KEY_BASE") ||
+      "a_very_long_dummy_secret_key_base_for_development_purposes_only_123456",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:convo_sim, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:convo_sim, ~w(--watch)]}
@@ -66,5 +68,5 @@ config :phoenix_live_view,
 
 # Conversation responder — swap back to ConvoSim.Responder.Simulated for offline dev
 config :convo_sim, :responder, ConvoSim.Responder.LMStudio
-config :convo_sim, :lm_studio_url, "http://192.168.0.249:1234"
+config :convo_sim, :lm_studio_url, "http://127.0.0.1:1234"
 config :convo_sim, :lm_studio_model, "qwen2.5-coder-3b-instruct"

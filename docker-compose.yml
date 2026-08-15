@@ -11,7 +11,6 @@ services:
       - deps:/app/deps
       - build:/app/_build
     environment:
-      - MIX_ENV=dev
       # Bind to all interfaces so the host can reach the dev server
       - PHX_HOST=localhost
     # Keep the container running even if the main command fails,
