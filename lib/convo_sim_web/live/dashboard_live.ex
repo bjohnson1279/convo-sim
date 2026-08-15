@@ -101,7 +101,7 @@ defmodule ConvoSimWeb.DashboardLive do
             <button
               id="spawn-convo-btn"
               phx-click="spawn_conversation"
-              class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center gap-2"
+              class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
             >
               <.icon name="hero-plus" class="w-4 h-4" /> Spawn Conversation
             </button>
@@ -183,7 +183,7 @@ defmodule ConvoSimWeb.DashboardLive do
                 phx-click="send_message"
                 phx-value-id={convo.id}
                 disabled={convo.status == :responding}
-                class="flex-1 py-1.5 px-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-200 text-xs font-medium rounded-lg transition border border-slate-700/60 flex items-center justify-center gap-1.5"
+                class="flex-1 py-1.5 px-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-200 text-xs font-medium rounded-lg transition border border-slate-700/60 flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
               >
                 <.icon name="hero-paper-airplane" class="w-3.5 h-3.5" /> Send Customer Message
               </button>
@@ -194,8 +194,8 @@ defmodule ConvoSimWeb.DashboardLive do
                 phx-value-id={convo.id}
                 data-confirm="Are you sure you want to stop this conversation?"
                 aria-label="Stop Conversation"
-                class="py-1.5 px-2.5 bg-red-950/40 hover:bg-red-900/60 text-red-400 text-xs font-medium rounded-lg transition border border-red-900/50 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                 title="Stop Process"
+                class="py-1.5 px-2.5 bg-red-950/40 hover:bg-red-900/60 text-red-400 text-xs font-medium rounded-lg transition border border-red-900/50 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
               >
                 <.icon name="hero-trash" class="w-3.5 h-3.5" />
               </button>

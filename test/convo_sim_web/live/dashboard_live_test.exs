@@ -23,6 +23,22 @@ defmodule ConvoSimWeb.DashboardLiveTest do
     assert render(view) =~ "conv-"
   end
 
+  test "renders accessibility attributes and data-confirm on conversation buttons", %{conn: conn} do
+    {:ok, id} = ConvoSim.ConversationManager.start_conversation()
+
+    {:ok, view, _html} = live(conn, ~p"/")
+
+    assert has_element?(
+             view,
+             ~s|button#stop-btn-#{id}[data-confirm="Are you sure you want to stop this conversation?"]|
+           )
+
+    assert has_element?(view, ~s|button#stop-btn-#{id}[aria-label="Stop Conversation"]|)
+    assert has_element?(view, ~s|button#send-btn-#{id}|)
+
+    ConvoSim.ConversationManager.stop_conversation(id)
+  end
+
   test "loads existing active conversations concurrently on mount", %{conn: conn} do
     {:ok, id1} = ConvoSim.ConversationManager.start_conversation()
     {:ok, id2} = ConvoSim.ConversationManager.start_conversation()
