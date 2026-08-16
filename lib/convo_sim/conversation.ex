@@ -5,7 +5,7 @@ defmodule ConvoSim.Conversation do
   use GenServer
 
   # State struct definition for cleaner access and default values
-  defstruct id: nil, status: :idle, messages: [], created_at: nil
+  defstruct id: nil, status: :idle, messages: [], message_count: 0, created_at: nil
 
   # --- Public API ---
 
@@ -47,6 +47,7 @@ defmodule ConvoSim.Conversation do
       id: id,
       status: :idle,
       messages: [],
+      message_count: 0,
       created_at: DateTime.utc_now()
     }
 
@@ -72,7 +73,13 @@ defmodule ConvoSim.Conversation do
     }
 
     # Prepend instead of append (O(1) instead of O(N))
-    new_state = %{state | messages: [customer_msg | state.messages], status: :responding}
+    # ⚡ Bolt: We cache message_count to avoid O(N) length() calls in the UI
+    new_state = %{
+      state
+      | messages: [customer_msg | state.messages],
+        message_count: state.message_count + 1,
+        status: :responding
+    }
 
     # Broadcast status change
     broadcast_all(new_state)
@@ -101,7 +108,13 @@ defmodule ConvoSim.Conversation do
     }
 
     # Prepend instead of append (O(1) instead of O(N))
-    new_state = %{state | messages: [ai_msg | state.messages], status: :idle}
+    # ⚡ Bolt: We cache message_count to avoid O(N) length() calls in the UI
+    new_state = %{
+      state
+      | messages: [ai_msg | state.messages],
+        message_count: state.message_count + 1,
+        status: :idle
+    }
 
     broadcast_all(new_state)
 
