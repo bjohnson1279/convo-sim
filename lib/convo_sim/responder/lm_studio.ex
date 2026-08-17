@@ -17,6 +17,8 @@ defmodule ConvoSim.Responder.LMStudio do
 
   @behaviour ConvoSim.Responder
 
+  require Logger
+
   # Default system prompt that gives the AI a customer-service persona
   @system_prompt """
   You are a helpful, friendly customer support assistant. Keep your responses
@@ -53,10 +55,12 @@ defmodule ConvoSim.Responder.LMStudio do
           "I'm sorry, I couldn't generate a response."
 
       {:ok, %{status: status, body: body}} ->
-        "⚠️ LM Studio returned HTTP #{status}: #{inspect(body)}"
+        Logger.error("LM Studio returned HTTP #{status}: #{inspect(body)}")
+        "⚠️ I'm sorry, I encountered an internal error."
 
       {:error, reason} ->
-        "⚠️ Failed to reach LM Studio: #{inspect(reason)}"
+        Logger.error("Failed to reach LM Studio: #{inspect(reason)}")
+        "⚠️ I'm sorry, I encountered an internal error."
     end
   end
 
