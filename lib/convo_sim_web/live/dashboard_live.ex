@@ -143,15 +143,17 @@ defmodule ConvoSimWeb.DashboardLive do
                 </span>
               </div>
               <%!-- Status Pill --%>
-              <%= if convo.status == :responding do %>
-                <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse">
-                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> AI Responding...
-                </span>
-              <% else %>
-                <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Idle
-                </span>
-              <% end %>
+              <div aria-live="polite" aria-atomic="true">
+                <%= if convo.status == :responding do %>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> AI Responding...
+                  </span>
+                <% else %>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Idle
+                  </span>
+                <% end %>
+              </div>
             </div>
             <%!-- Messages Scroll Box --%>
             <div class="flex-1 my-4 space-y-3 min-h-[160px] max-h-[240px] overflow-y-auto pr-1 text-xs scrollbar-thin">
@@ -184,6 +186,11 @@ defmodule ConvoSimWeb.DashboardLive do
                 phx-click="send_message"
                 phx-value-id={convo.id}
                 disabled={convo.status == :responding}
+                title={
+                  if convo.status == :responding,
+                    do: "Please wait for AI response",
+                    else: "Send customer message"
+                }
                 class="flex-1 py-1.5 px-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-200 text-xs font-medium rounded-lg transition border border-slate-700/60 flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
               >
                 <.icon name="hero-paper-airplane" class="w-3.5 h-3.5" /> Send Customer Message
