@@ -6,3 +6,7 @@
 **Learning:** Appending to a linked list via `list ++ [new_item]` inside a long-running process (like a GenServer state) causes `O(N^2)` accumulation performance because `++` has to copy the entire list on every append. Reversing the list dynamically inside `handle_call` or right before broadcasting is surprisingly fast compared to the penalty of `++` copying for large state lists.
 **Action:** When accumulating state over time in Elixir GenServers, ALWAYS prepend lists (`[item | list]`) which is `O(1)`. Only reverse the list via `Enum.reverse/1` right at the edge when formatting the state for the UI, broadcasts, or returning to callers.
 
+
+## 2024-05-20 - O(N) length/1 penalty in Elixir templates
+**Learning:** `length/1` in Elixir is an `O(N)` operation because it traverses the entire linked list to count its elements. Calling it within a LiveView template (e.g. `{length(list)}`) means this `O(N)` penalty is paid on every re-render. As lists (like conversation histories) grow, this can degrade rendering performance.
+**Action:** When you need the length of a frequently-updated list in a LiveView, track the count as an integer property in the state struct (e.g., `message_count: 0`), and increment it when prepending items. This turns the UI lookup into an `O(1)` property access.

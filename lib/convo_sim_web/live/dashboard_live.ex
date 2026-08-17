@@ -138,7 +138,8 @@ defmodule ConvoSimWeb.DashboardLive do
                 </span>
 
                 <span class="text-xs text-slate-500">
-                  {length(convo.messages)} msgs
+                  <%!-- ⚡ Bolt: Use O(1) cached message_count instead of O(N) length() --%>
+                  {convo.message_count} msgs
                 </span>
               </div>
               <%!-- Status Pill --%>
