@@ -1,6 +1,8 @@
 defmodule ConvoSimWeb.DashboardLive do
   use ConvoSimWeb, :live_view
 
+  require Logger
+
   alias ConvoSim.ConversationManager
 
   @impl true
@@ -26,7 +28,9 @@ defmodule ConvoSimWeb.DashboardLive do
         {:noreply, put_flash(socket, :info, "Started new conversation")}
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to start: #{inspect(reason)}")}
+        # 🛡️ Sentinel: Log internal error to avoid information leakage in UI
+        Logger.error("Failed to start conversation: #{inspect(reason)}")
+        {:noreply, put_flash(socket, :error, "Failed to start conversation. Please try again.")}
     end
   end
 
@@ -54,7 +58,11 @@ defmodule ConvoSimWeb.DashboardLive do
         {:noreply, stream_delete_by_id(socket, :conversations, id)}
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to stop: #{inspect(reason)}")}
+        # 🛡️ Sentinel: Log internal error to avoid information leakage in UI
+        Logger.error("Failed to stop conversation #{id}: #{inspect(reason)}")
+
+        {:noreply,
+         put_flash(socket, :error, "Failed to stop conversation. It may have already ended.")}
     end
   end
 
