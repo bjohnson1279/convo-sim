@@ -59,9 +59,8 @@ defmodule ConvoSim.Conversation do
 
   @impl GenServer
   def handle_call(:get_state, _from, state) do
-    # Reverse messages to maintain chronological order for callers
-    reply_state = %{state | messages: Enum.reverse(state.messages)}
-    {:reply, reply_state, state}
+    # ⚡ Bolt: Return prepended state directly to avoid O(N) Enum.reverse/1 blocking the GenServer
+    {:reply, state, state}
   end
 
   @impl GenServer
@@ -124,13 +123,13 @@ defmodule ConvoSim.Conversation do
   # --- Private Helpers ---
 
   defp broadcast_all(state) do
-    # Reverse messages before broadcast so the UI receives them in chronological order
-    broadcast_state = %{state | messages: Enum.reverse(state.messages)}
+    # ⚡ Bolt: Broadcast prepended state directly to avoid O(N) Enum.reverse/1 on every message
+    # The UI will use CSS flex-col-reverse to display them chronologically
 
     # Broadcast to global topic
-    broadcast("conversations", broadcast_state)
+    broadcast("conversations", state)
     # Broadcast to per-conversation topic
-    broadcast("conversation:#{broadcast_state.id}", broadcast_state)
+    broadcast("conversation:#{state.id}", state)
   end
 
   defp broadcast(topic, state) do
