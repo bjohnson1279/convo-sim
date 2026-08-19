@@ -89,8 +89,8 @@ defmodule ConvoSim.Conversation do
     pid = self()
 
     Task.start(fn ->
-      # Reverse messages to pass chronological history to the responder
-      response = responder.respond(content, Enum.reverse(state.messages))
+      # ⚡ Bolt: Pass newest-first history directly without Enum.reverse/1
+      response = responder.respond(content, state.messages)
       # Send the result back to the GenServer using standard Erlang messaging
       send(pid, {:ai_response, response})
     end)
