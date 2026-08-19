@@ -196,6 +196,9 @@ defmodule ConvoSimWeb.DashboardLive do
                 phx-value-id={convo.id}
                 disabled={convo.status == :responding}
                 title={
+                  if convo.status == :responding,
+                    do: "Please wait for AI response",
+                    else: "Send customer message"
                   if(convo.status == :responding,
                     do: "Please wait for AI to finish responding before sending another message",
                     else: "Send Customer Message"
