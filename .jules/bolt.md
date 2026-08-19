@@ -13,3 +13,7 @@
 ## 2024-05-24 - [O(1) Chat Rendering with flex-col-reverse]
 **Learning:** Reversing large GenServer lists via `Enum.reverse/1` before broadcasting to the UI is an O(N) operation that blocks the GenServer. By utilizing Tailwind's `flex-col-reverse` in the UI, we can send the list exactly as it's stored (prepended, newest-first) and the browser natively renders it chronologically bottom-to-top.
 **Action:** Always consider if CSS can solve data-ordering problems in the UI to prevent O(N) data transformations in Elixir processes.
+
+## 2024-11-20 - O(N) penalty with list concatenation (++)
+**Learning:** Using the `++` operator to concatenate lists creates unnecessary list copies, causing `O(N^2)` accumulation performance, and combining it with `Enum.map/2` involves traversing the list multiple times.
+**Action:** To avoid O(N^2) list concatenation performance penalties in Elixir, prefer using `Enum.reduce/3` to build, map, and reverse prepended lists in a single O(N) pass, rather than combining `Enum.map/2` with the `++` operator.

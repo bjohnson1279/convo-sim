@@ -3,7 +3,7 @@ defmodule ConvoSim.Responder do
   Behaviour defining the contract for AI responders.
   """
 
-  @doc "Given a customer message and conversation history, return an AI response string."
+  @doc "Given a customer message and conversation history (newest-first), return an AI response string."
   @callback respond(message :: String.t(), history :: list()) :: String.t()
 end
 
