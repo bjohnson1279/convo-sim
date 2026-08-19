@@ -10,3 +10,6 @@
 ## 2024-05-20 - O(N) length/1 penalty in Elixir templates
 **Learning:** `length/1` in Elixir is an `O(N)` operation because it traverses the entire linked list to count its elements. Calling it within a LiveView template (e.g. `{length(list)}`) means this `O(N)` penalty is paid on every re-render. As lists (like conversation histories) grow, this can degrade rendering performance.
 **Action:** When you need the length of a frequently-updated list in a LiveView, track the count as an integer property in the state struct (e.g., `message_count: 0`), and increment it when prepending items. This turns the UI lookup into an `O(1)` property access.
+## 2024-05-24 - [O(1) Chat Rendering with flex-col-reverse]
+**Learning:** Reversing large GenServer lists via `Enum.reverse/1` before broadcasting to the UI is an O(N) operation that blocks the GenServer. By utilizing Tailwind's `flex-col-reverse` in the UI, we can send the list exactly as it's stored (prepended, newest-first) and the browser natively renders it chronologically bottom-to-top.
+**Action:** Always consider if CSS can solve data-ordering problems in the UI to prevent O(N) data transformations in Elixir processes.

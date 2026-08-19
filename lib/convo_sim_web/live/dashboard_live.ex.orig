@@ -1,8 +1,6 @@
 defmodule ConvoSimWeb.DashboardLive do
   use ConvoSimWeb, :live_view
 
-  require Logger
-
   alias ConvoSim.ConversationManager
 
   @impl true
@@ -28,9 +26,7 @@ defmodule ConvoSimWeb.DashboardLive do
         {:noreply, put_flash(socket, :info, "Started new conversation")}
 
       {:error, reason} ->
-        # 🛡️ Sentinel: Log internal error to avoid information leakage in UI
-        Logger.error("Failed to start conversation: #{inspect(reason)}")
-        {:noreply, put_flash(socket, :error, "Failed to start conversation. Please try again.")}
+        {:noreply, put_flash(socket, :error, "Failed to start: #{inspect(reason)}")}
     end
   end
 
@@ -58,11 +54,7 @@ defmodule ConvoSimWeb.DashboardLive do
         {:noreply, stream_delete_by_id(socket, :conversations, id)}
 
       {:error, reason} ->
-        # 🛡️ Sentinel: Log internal error to avoid information leakage in UI
-        Logger.error("Failed to stop conversation #{id}: #{inspect(reason)}")
-
-        {:noreply,
-         put_flash(socket, :error, "Failed to stop conversation. It may have already ended.")}
+        {:noreply, put_flash(socket, :error, "Failed to stop: #{inspect(reason)}")}
     end
   end
 
@@ -164,8 +156,7 @@ defmodule ConvoSimWeb.DashboardLive do
               </div>
             </div>
             <%!-- Messages Scroll Box --%>
-            <%!-- ⚡ Bolt: Use flex-col-reverse to offload O(N) message ordering from BEAM to CSS natively --%>
-            <div class="flex-1 my-4 flex flex-col-reverse gap-3 min-h-[160px] max-h-[240px] overflow-y-auto pr-1 text-xs scrollbar-thin">
+            <div class="flex-1 my-4 space-y-3 min-h-[160px] max-h-[240px] overflow-y-auto pr-1 text-xs scrollbar-thin">
               <%= if convo.messages == [] do %>
                 <div class="h-full flex items-center justify-center text-slate-600 italic">
                   No messages yet. Click "Send Message".
@@ -195,15 +186,6 @@ defmodule ConvoSimWeb.DashboardLive do
                 phx-click="send_message"
                 phx-value-id={convo.id}
                 disabled={convo.status == :responding}
-                title={
-                  if convo.status == :responding,
-                    do: "Please wait for AI response",
-                    else: "Send customer message"
-                  if(convo.status == :responding,
-                    do: "Please wait for AI to finish responding before sending another message",
-                    else: "Send Customer Message"
-                  )
-                }
                 class="flex-1 py-1.5 px-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-200 text-xs font-medium rounded-lg transition border border-slate-700/60 flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
               >
                 <.icon name="hero-paper-airplane" class="w-3.5 h-3.5" /> Send Customer Message
