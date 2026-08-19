@@ -1,3 +1,6 @@
 ## 2024-05-24 - Phoenix LiveView Destructive Actions
 **Learning:** Destructive actions in LiveView often lack native confirmation prompts and proper accessibility attributes for icon-only buttons.
 **Action:** Always use native `data-confirm` for destructive actions, `aria-label` for icon-only buttons, and `focus-visible` utilities to ensure keyboard accessibility in Phoenix LiveView templates.
+## 2024-08-18 - Communicating Dynamic State
+**Learning:** Sighted users often struggle to understand why a button is disabled, while screen reader users need updates when dynamic content like status badges change independently of user action.
+**Action:** Always add descriptive `title` attributes explaining the disabled state dynamically, and wrap live-updating status indicators in `aria-live="polite"` regions.
