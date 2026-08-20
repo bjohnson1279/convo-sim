@@ -17,3 +17,7 @@
 ## 2024-11-20 - O(N) penalty with list concatenation (++)
 **Learning:** Using the `++` operator to concatenate lists creates unnecessary list copies, causing `O(N^2)` accumulation performance, and combining it with `Enum.map/2` involves traversing the list multiple times.
 **Action:** To avoid O(N^2) list concatenation performance penalties in Elixir, prefer using `Enum.reduce/3` to build, map, and reverse prepended lists in a single O(N) pass, rather than combining `Enum.map/2` with the `++` operator.
+
+## 2023-10-24 - Native Pattern Matching vs `get_in/2` in Elixir
+**Learning:** While `get_in/2` combined with `Access.at/1` is convenient for deeply nested map/list extraction (like parsing OpenAI API responses), it is significantly slower than native BEAM pattern matching. The dynamic nature of `get_in` requires allocating closures and intermediate lists under the hood. In microbenchmarks on this codebase, a native pattern match (`%{"choices" => [%{"message" => %{"content" => content}} | _]}`) gave a ~5x speedup over `get_in(body, ["choices", Access.at(0), "message", "content"])`.
+**Action:** When extracting data from heavily nested JSON maps (especially in critical paths or where high throughput is expected), prefer idiomatic Elixir pattern matching over `get_in/2` unless the path itself needs to be dynamic.
