@@ -109,6 +109,7 @@ defmodule ConvoSimWeb.DashboardLive do
             <button
               id="spawn-convo-btn"
               phx-click="spawn_conversation"
+              phx-disable-with="Spawning..."
               class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
             >
               <.icon name="hero-plus" class="w-4 h-4" /> Spawn Conversation
@@ -196,9 +197,6 @@ defmodule ConvoSimWeb.DashboardLive do
                 phx-value-id={convo.id}
                 disabled={convo.status == :responding}
                 title={
-                  if convo.status == :responding,
-                    do: "Please wait for AI response",
-                    else: "Send customer message"
                   if(convo.status == :responding,
                     do: "Please wait for AI to finish responding before sending another message",
                     else: "Send Customer Message"
