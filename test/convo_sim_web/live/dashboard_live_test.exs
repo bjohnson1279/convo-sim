@@ -3,11 +3,12 @@ defmodule ConvoSimWeb.DashboardLiveTest do
 
   import Phoenix.LiveViewTest
 
-  test "renders dashboard title and empty state", %{conn: conn} do
+  test "renders dashboard title, logo alt text, and empty state", %{conn: conn} do
     {:ok, view, html} = live(conn, ~p"/")
 
     assert html =~ "Real-Time Conversation Simulator"
-    assert has_element?(view, "#spawn-convo-btn")
+    assert has_element?(view, ~s|img[alt="ConvoSim Logo"]|)
+    assert has_element?(view, ~s|button#spawn-convo-btn[phx-disable-with="Spawning..."]|)
     assert has_element?(view, "#conversations")
   end
 
@@ -34,7 +35,7 @@ defmodule ConvoSimWeb.DashboardLiveTest do
            )
 
     assert has_element?(view, ~s|button#stop-btn-#{id}[aria-label="Stop Conversation"]|)
-    assert has_element?(view, ~s|button#send-btn-#{id}|)
+    assert has_element?(view, ~s|button#send-btn-#{id}[title="Send Customer Message"]|)
 
     ConvoSim.ConversationManager.stop_conversation(id)
   end
