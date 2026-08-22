@@ -204,6 +204,7 @@ defmodule ConvoSimWeb.DashboardLive do
                 phx-click="send_message"
                 phx-value-id={convo.id}
                 disabled={convo.status == :responding}
+                phx-disable-with="Sending..."
                 title={
                   if(convo.status == :responding,
                     do: "Please wait for AI to finish responding before sending another message",
@@ -219,6 +220,7 @@ defmodule ConvoSimWeb.DashboardLive do
                 id={"stop-btn-#{convo.id}"}
                 phx-click="stop_conversation"
                 phx-value-id={convo.id}
+                phx-disable-with="Stopping..."
                 data-confirm="Are you sure you want to stop this conversation?"
                 aria-label="Stop Conversation"
                 title="Stop Process"
