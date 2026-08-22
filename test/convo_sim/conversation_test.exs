@@ -6,6 +6,7 @@ defmodule ConvoSim.ConversationTest do
 
   test "starts a conversation and handles state transitions" do
     {:ok, id} = ConversationManager.start_conversation()
+    assert String.match?(id, ~r/^conv-[0-9a-f]{8}$/)
     assert id in ConversationManager.list_conversations()
 
     state = ConversationManager.get_state(id)

@@ -48,7 +48,9 @@ defmodule ConvoSimWeb.DashboardLiveTest do
            )
 
     assert has_element?(view, ~s|button#stop-btn-#{id}[aria-label="Stop Conversation"]|)
+    assert has_element?(view, ~s|button#stop-btn-#{id}[phx-disable-with="Stopping..."]|)
     assert has_element?(view, ~s|button#send-btn-#{id}[title="Send Customer Message"]|)
+    assert has_element?(view, ~s|button#send-btn-#{id}[phx-disable-with="Sending..."]|)
 
     ConvoSim.ConversationManager.stop_conversation(id)
   end
