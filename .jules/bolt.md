@@ -21,3 +21,7 @@
 ## 2023-10-24 - Native Pattern Matching vs `get_in/2` in Elixir
 **Learning:** While `get_in/2` combined with `Access.at/1` is convenient for deeply nested map/list extraction (like parsing OpenAI API responses), it is significantly slower than native BEAM pattern matching. The dynamic nature of `get_in` requires allocating closures and intermediate lists under the hood. In microbenchmarks on this codebase, a native pattern match (`%{"choices" => [%{"message" => %{"content" => content}} | _]}`) gave a ~5x speedup over `get_in(body, ["choices", Access.at(0), "message", "content"])`.
 **Action:** When extracting data from heavily nested JSON maps (especially in critical paths or where high throughput is expected), prefer idiomatic Elixir pattern matching over `get_in/2` unless the path itself needs to be dynamic.
+
+## 2024-08-22 - Optimize UUID generation string allocations and entropy usage
+**Learning:** Generating full 16-byte UUIDs and then hex-encoding and slicing them just to get an 8-character ID is highly inefficient. It wastes 12 bytes of system entropy (which can be a bottleneck on `/dev/urandom` under high concurrency) and causes unnecessary memory allocations for the 32-character intermediate string and the subsequent string slice operation.
+**Action:** When a short random string ID is needed (like an 8-character hex string), generate exactly the required bytes (`:crypto.strong_rand_bytes(4)`) and encode them directly, avoiding both entropy waste and intermediate string allocations.
