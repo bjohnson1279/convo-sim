@@ -12,3 +12,8 @@
 **Vulnerability:** The AI responder (`lib/convo_sim/responder/lm_studio.ex`) was leaking full external API response bodies and HTTP status codes directly to the UI when errors occurred.
 **Learning:** Exposing internal system errors, raw API responses, or stack traces directly to the end user can leak sensitive infrastructure details, network topology, or authentication materials.
 **Prevention:** Always log the verbose error details internally (e.g. `Logger.error`) and return a safe, generic error message to the user.
+
+## 2024-08-22 - Prevent Resource Exhaustion (DoS)
+**Vulnerability:** A lack of limits on concurrently spawned conversations allowed a Denial of Service via Resource Exhaustion (crashing the BEAM).
+**Learning:** Publicly accessible endpoints or events that dynamically spawn GenServers must have concurrency limits to prevent attackers from exhausting VM resources (PIDs/Memory).
+**Prevention:** Use fast mechanisms like `Registry.count/1` to enforce maximum process bounds before spawning new workers.
