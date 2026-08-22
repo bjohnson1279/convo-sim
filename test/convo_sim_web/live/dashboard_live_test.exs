@@ -9,6 +9,7 @@ defmodule ConvoSimWeb.DashboardLiveTest do
     assert html =~ "Real-Time Conversation Simulator"
     assert has_element?(view, ~s|img[alt="ConvoSim Logo"]|)
     assert has_element?(view, ~s|button#spawn-convo-btn[phx-disable-with="Spawning..."]|)
+    assert has_element?(view, ~s|button#empty-state-spawn-btn[phx-disable-with="Spawning..."]|)
     assert has_element?(view, "#conversations")
   end
 
@@ -17,6 +18,18 @@ defmodule ConvoSimWeb.DashboardLiveTest do
 
     view
     |> element("#spawn-convo-btn")
+    |> render_click()
+
+    # Verify a conversation card appeared in the stream
+    assert has_element?(view, "#conversations")
+    assert render(view) =~ "conv-"
+  end
+
+  test "spawns a conversation when clicking empty state spawn button", %{conn: conn} do
+    {:ok, view, _html} = live(conn, ~p"/")
+
+    view
+    |> element("#empty-state-spawn-btn")
     |> render_click()
 
     # Verify a conversation card appeared in the stream
