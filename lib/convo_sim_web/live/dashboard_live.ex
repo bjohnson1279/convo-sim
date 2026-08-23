@@ -13,7 +13,10 @@ defmodule ConvoSimWeb.DashboardLive do
     end
 
     # Fetch initial active conversations
-    conversations = load_conversations()
+    # ⚡ Bolt: Avoid duplicate expensive GenServer state fetches on initial page load
+    # By only loading conversations when the WebSocket is connected, we skip the N+1
+    # process state fetches during the disconnected HTTP render, speeding up time-to-first-byte.
+    conversations = if connected?(socket), do: load_conversations(), else: []
 
     {:ok,
      socket
