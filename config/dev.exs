@@ -16,7 +16,7 @@ config :convo_sim, ConvoSimWeb.Endpoint,
   debug_errors: true,
   secret_key_base:
     System.get_env("SECRET_KEY_BASE") ||
-      "a_very_long_dummy_secret_key_base_for_development_purposes_only_123456",
+      Base.encode16(:crypto.strong_rand_bytes(32), case: :lower),
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:convo_sim, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:convo_sim, ~w(--watch)]}
