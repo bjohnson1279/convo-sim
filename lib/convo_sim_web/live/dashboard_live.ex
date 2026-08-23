@@ -30,6 +30,16 @@ defmodule ConvoSimWeb.DashboardLive do
       {:ok, _id} ->
         {:noreply, put_flash(socket, :info, "Started new conversation")}
 
+      {:error, :too_many_conversations} ->
+        Logger.warning("Maximum conversation limit reached (50)")
+
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "Maximum limit of 50 active conversations reached. Please stop an existing conversation first."
+         )}
+
       {:error, reason} ->
         # 🛡️ Sentinel: Log internal error to avoid information leakage in UI
         Logger.error("Failed to start conversation: #{inspect(reason)}")

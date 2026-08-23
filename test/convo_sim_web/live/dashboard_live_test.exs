@@ -67,4 +67,21 @@ defmodule ConvoSimWeb.DashboardLiveTest do
     ConvoSim.ConversationManager.stop_conversation(id1)
     ConvoSim.ConversationManager.stop_conversation(id2)
   end
+
+  test "displays error flash when spawn limit is reached", %{conn: conn} do
+    {:ok, view, _html} = live(conn, ~p"/")
+
+    current_count = Registry.count(ConvoSim.ConversationRegistry)
+    needed = max(0, 50 - current_count)
+
+    for i <- 1..needed do
+      Registry.register(ConvoSim.ConversationRegistry, "dash-limit-#{i}", :ok)
+    end
+
+    view
+    |> element("#spawn-convo-btn")
+    |> render_click()
+
+    assert render(view) =~ "Maximum limit of 50 active conversations reached"
+  end
 end

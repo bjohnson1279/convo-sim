@@ -9,17 +9,17 @@ defmodule ConvoSim.ConversationManager do
   Returns the generated id.
   """
   def start_conversation() do
-    # Generate a short readable ID (e.g., "conv-" <> first 8 chars of a UUID)
-    # Using Ecto.UUID if available, or just purely Erlang's unique id generator if not.
-    # Let's use :crypto.strong_rand_bytes to avoid depending on Ecto just for UUIDs.
-    # ⚡ Bolt: Generate 4 bytes instead of 16 to avoid entropy depletion and eliminate
-    # O(N) String.slice/3 allocation of intermediate 32-char string.
-    id = "conv-" <> Base.encode16(:crypto.strong_rand_bytes(4), case: :lower)
-
-    # ⚡ Bolt: Prevent Resource Exhaustion (DoS) by enforcing limits on active processes
-    if Registry.count(ConvoSim.ConversationRegistry) >= 100 do
+    # 🛡️ Sentinel: Prevent Resource Exhaustion (DoS) by limiting active conversations
+    if Registry.count(ConvoSim.ConversationRegistry) >= 50 do
       {:error, :too_many_conversations}
     else
+      # Generate a short readable ID (e.g., "conv-" <> first 8 chars of a UUID)
+      # Using Ecto.UUID if available, or just purely Erlang's unique id generator if not.
+      # Let's use :crypto.strong_rand_bytes to avoid depending on Ecto just for UUIDs.
+      # ⚡ Bolt: Generate 4 bytes instead of 16 to avoid entropy depletion and eliminate
+      # O(N) String.slice/3 allocation of intermediate 32-char string.
+      id = "conv-" <> Base.encode16(:crypto.strong_rand_bytes(4), case: :lower)
+
       # Start the child dynamically under our supervisor
       # The child spec is based on ConvoSim.Conversation's use of GenServer
       spec = %{
