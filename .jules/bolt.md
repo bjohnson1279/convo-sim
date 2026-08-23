@@ -25,3 +25,7 @@
 ## 2024-08-22 - Optimize UUID generation string allocations and entropy usage
 **Learning:** Generating full 16-byte UUIDs and then hex-encoding and slicing them just to get an 8-character ID is highly inefficient. It wastes 12 bytes of system entropy (which can be a bottleneck on `/dev/urandom` under high concurrency) and causes unnecessary memory allocations for the 32-character intermediate string and the subsequent string slice operation.
 **Action:** When a short random string ID is needed (like an 8-character hex string), generate exactly the required bytes (`:crypto.strong_rand_bytes(4)`) and encode them directly, avoiding both entropy waste and intermediate string allocations.
+
+## 2024-11-20 - Defer expensive GenServer state fetches on initial page load
+**Learning:** In Phoenix LiveView apps, fetching distributed GenServer state sequentially or in parallel during the disconnected HTTP render (`mount`) blocks the response and increases time-to-first-byte (TTFB), causing an N+1 bottleneck. This duplicate work is discarded when the WebSocket connects and triggers another `mount`.
+**Action:** When a LiveView depends on expensive operations like distributed state fetching, use `if connected?(socket)` in the `mount` callback to defer loading data until the stateful WebSocket connection is established, rendering a lightweight initial HTTP response.
