@@ -8,7 +8,18 @@ defmodule ConvoSim.ConversationManager do
   Starts a new conversation process under the DynamicSupervisor.
   Returns the generated id.
   """
+  @max_conversations 100
+
   def start_conversation() do
+    # 🛡️ Sentinel: Enforce process limit to prevent Resource Exhaustion (DoS)
+    if Registry.count(ConvoSim.ConversationRegistry) >= @max_conversations do
+      {:error, :limit_reached}
+    else
+      start_conversation_internal()
+    end
+  end
+
+  defp start_conversation_internal() do
     # Generate a short readable ID (e.g., "conv-" <> first 8 chars of a UUID)
     # Using Ecto.UUID if available, or just purely Erlang's unique id generator if not.
     # Let's use :crypto.strong_rand_bytes to avoid depending on Ecto just for UUIDs.

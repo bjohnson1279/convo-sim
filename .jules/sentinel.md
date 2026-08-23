@@ -17,3 +17,8 @@
 **Vulnerability:** High severity HTTP/2 connection-window starvation (CVE-2026-74836) and Medium severity header validation issues (CVE-2026-75484) in `bandit` v1.12.4.
 **Learning:** Outdated web server dependencies can expose the application to denial-of-service (DoS) and request smuggling attacks.
 **Prevention:** Regularly audit dependencies using tools like `mix hex.audit` (or other dependency audit tools) and apply security patches promptly.
+
+## 2026-08-23 - Prevent Resource Exhaustion via Process Spawning
+**Vulnerability:** The application allowed spawning isolated GenServer processes for conversations without enforcing any upper limit, leading to a Resource Exhaustion (DoS) vulnerability.
+**Learning:** In dynamically scaled BEAM applications, failing to enforce a limit on spawned processes enables malicious actors to exhaust system resources (memory, BEAM schedulers) by repeatedly triggering process creation endpoints.
+**Prevention:** Enforce process limits using robust registry counting tools (e.g., `Registry.count/1`) before dynamically spawning GenServers to protect against DoS attacks.
