@@ -27,6 +27,16 @@ defmodule ConvoSimWeb.DashboardLive do
       {:ok, _id} ->
         {:noreply, put_flash(socket, :info, "Started new conversation")}
 
+      {:error, :too_many_conversations} ->
+        Logger.warning("Maximum conversation limit reached (50)")
+
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "Maximum limit of 50 active conversations reached. Please stop an existing conversation first."
+         )}
+
       {:error, reason} ->
         # 🛡️ Sentinel: Log internal error to avoid information leakage in UI
         Logger.error("Failed to start conversation: #{inspect(reason)}")
@@ -129,9 +139,18 @@ defmodule ConvoSimWeb.DashboardLive do
             <.icon name="hero-chat-bubble-oval-left" class="w-12 h-12 text-slate-600 mb-3" />
             <h3 class="text-base font-semibold text-slate-300">No Active Conversations</h3>
 
-            <p class="text-sm text-slate-500 mt-1 max-w-sm">
-              Click "Spawn Conversation" above to launch lightweight GenServer processes on the BEAM VM.
+            <p class="text-sm text-slate-500 mt-1 max-w-sm mb-4">
+              Launch lightweight GenServer processes on the BEAM VM to get started.
             </p>
+
+            <button
+              id="empty-state-spawn-btn"
+              phx-click="spawn_conversation"
+              phx-disable-with="Spawning..."
+              class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-xl transition border border-slate-700/60 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 shadow-sm"
+            >
+              <.icon name="hero-plus" class="w-4 h-4" /> Spawn Conversation
+            </button>
           </div>
 
           <div
@@ -195,6 +214,7 @@ defmodule ConvoSimWeb.DashboardLive do
                 phx-click="send_message"
                 phx-value-id={convo.id}
                 disabled={convo.status == :responding}
+                phx-disable-with="Sending..."
                 title={
                   if(convo.status == :responding,
                     do: "Please wait for AI to finish responding before sending another message",
@@ -210,6 +230,7 @@ defmodule ConvoSimWeb.DashboardLive do
                 id={"stop-btn-#{convo.id}"}
                 phx-click="stop_conversation"
                 phx-value-id={convo.id}
+                phx-disable-with="Stopping..."
                 data-confirm="Are you sure you want to stop this conversation?"
                 aria-label="Stop Conversation"
                 title="Stop Process"

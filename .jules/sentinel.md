@@ -17,3 +17,8 @@
 **Vulnerability:** A lack of limits on concurrently spawned conversations allowed a Denial of Service via Resource Exhaustion (crashing the BEAM).
 **Learning:** Publicly accessible endpoints or events that dynamically spawn GenServers must have concurrency limits to prevent attackers from exhausting VM resources (PIDs/Memory).
 **Prevention:** Use fast mechanisms like `Registry.count/1` to enforce maximum process bounds before spawning new workers.
+
+## 2026-08-22 - Bandit HTTP/2 Vulnerabilities
+**Vulnerability:** High severity HTTP/2 connection-window starvation (CVE-2026-74836) and Medium severity header validation issues (CVE-2026-75484) in `bandit` v1.12.4.
+**Learning:** Outdated web server dependencies can expose the application to denial-of-service (DoS) and request smuggling attacks.
+**Prevention:** Regularly audit dependencies using tools like `mix hex.audit` (or other dependency audit tools) and apply security patches promptly.
