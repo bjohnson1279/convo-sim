@@ -13,6 +13,11 @@
 **Learning:** Exposing internal system errors, raw API responses, or stack traces directly to the end user can leak sensitive infrastructure details, network topology, or authentication materials.
 **Prevention:** Always log the verbose error details internally (e.g. `Logger.error`) and return a safe, generic error message to the user.
 
+## 2024-08-22 - Prevent Resource Exhaustion (DoS)
+**Vulnerability:** A lack of limits on concurrently spawned conversations allowed a Denial of Service via Resource Exhaustion (crashing the BEAM).
+**Learning:** Publicly accessible endpoints or events that dynamically spawn GenServers must have concurrency limits to prevent attackers from exhausting VM resources (PIDs/Memory).
+**Prevention:** Use fast mechanisms like `Registry.count/1` to enforce maximum process bounds before spawning new workers.
+
 ## 2026-08-22 - Bandit HTTP/2 Vulnerabilities
 **Vulnerability:** High severity HTTP/2 connection-window starvation (CVE-2026-74836) and Medium severity header validation issues (CVE-2026-75484) in `bandit` v1.12.4.
 **Learning:** Outdated web server dependencies can expose the application to denial-of-service (DoS) and request smuggling attacks.
