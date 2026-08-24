@@ -16,8 +16,18 @@ defmodule ConvoSim.Conversation do
   def start_link(id) do
     # The :via tuple is a way to register a process under a custom name,
     # in this case using our custom Registry instead of a global atom.
-    name = {:via, Registry, {ConvoSim.ConversationRegistry, id}}
-    GenServer.start_link(__MODULE__, id, name: name)
+    # ⚡ Bolt: Register the initial state as the value in the Registry to allow
+    # O(1) bulk reads from the ETS table without hitting the GenServer message queue.
+    initial_state = %__MODULE__{
+      id: id,
+      status: :idle,
+      messages: [],
+      message_count: 0,
+      created_at: DateTime.utc_now()
+    }
+
+    name = {:via, Registry, {ConvoSim.ConversationRegistry, id, initial_state}}
+    GenServer.start_link(__MODULE__, {id, initial_state}, name: name)
   end
 
   @doc """
@@ -42,15 +52,7 @@ defmodule ConvoSim.Conversation do
   # --- GenServer Callbacks ---
 
   @impl GenServer
-  def init(id) do
-    state = %__MODULE__{
-      id: id,
-      status: :idle,
-      messages: [],
-      message_count: 0,
-      created_at: DateTime.utc_now()
-    }
-
+  def init({_id, state}) do
     # Broadcast that the conversation started to the global topic
     broadcast("conversations", state)
 
@@ -79,6 +81,9 @@ defmodule ConvoSim.Conversation do
         message_count: state.message_count + 1,
         status: :responding
     }
+
+    # ⚡ Bolt: Sync state to ETS Registry for O(1) bulk reads
+    Registry.update_value(ConvoSim.ConversationRegistry, state.id, fn _old -> new_state end)
 
     # Broadcast status change
     broadcast_all(new_state)
@@ -114,6 +119,9 @@ defmodule ConvoSim.Conversation do
         message_count: state.message_count + 1,
         status: :idle
     }
+
+    # ⚡ Bolt: Sync state to ETS Registry for O(1) bulk reads
+    Registry.update_value(ConvoSim.ConversationRegistry, state.id, fn _old -> new_state end)
 
     broadcast_all(new_state)
 
