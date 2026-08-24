@@ -7,3 +7,6 @@
 ## 2024-05-15 - [Theme Toggle Accessibility]
 **Learning:** Icon-only buttons like theme toggles are completely invisible to screen readers without ARIA labels, and without explicit focus-visible styles, keyboard users cannot navigate them predictably.
 **Action:** Always add `aria-label`, an optional `title` tooltip, and robust `focus-visible` states to any interaction element that only contains an icon.
+## 2024-11-20 - Chat Application Accessibility
+**Learning:** Chat messages appended dynamically are invisible to screen readers without specific ARIA attributes.
+**Action:** Always use `role="log"` and `aria-live="polite"` on chat message containers to ensure screen readers announce incoming messages.
