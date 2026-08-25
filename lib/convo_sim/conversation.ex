@@ -16,7 +16,8 @@ defmodule ConvoSim.Conversation do
   def start_link(id) do
     # The :via tuple is a way to register a process under a custom name,
     # in this case using our custom Registry instead of a global atom.
-    name = {:via, Registry, {ConvoSim.ConversationRegistry, id}}
+    # We include the initial state in the registry value to allow O(1) state fetching.
+    name = {:via, Registry, {ConvoSim.ConversationRegistry, id, %__MODULE__{id: id}}}
     GenServer.start_link(__MODULE__, id, name: name)
   end
 
@@ -51,6 +52,9 @@ defmodule ConvoSim.Conversation do
       created_at: DateTime.utc_now()
     }
 
+    # Store the complete initial state in the Registry value for O(1) fetching
+    Registry.update_value(ConvoSim.ConversationRegistry, state.id, fn _ -> state end)
+
     # Broadcast that the conversation started to the global topic
     broadcast("conversations", state)
 
@@ -79,6 +83,9 @@ defmodule ConvoSim.Conversation do
         message_count: state.message_count + 1,
         status: :responding
     }
+
+    # Update state in Registry for O(1) fetching
+    Registry.update_value(ConvoSim.ConversationRegistry, new_state.id, fn _ -> new_state end)
 
     # Broadcast status change
     broadcast_all(new_state)
@@ -114,6 +121,9 @@ defmodule ConvoSim.Conversation do
         message_count: state.message_count + 1,
         status: :idle
     }
+
+    # Update state in Registry for O(1) fetching
+    Registry.update_value(ConvoSim.ConversationRegistry, new_state.id, fn _ -> new_state end)
 
     broadcast_all(new_state)
 

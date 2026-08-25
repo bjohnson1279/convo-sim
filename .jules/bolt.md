@@ -29,3 +29,7 @@
 ## 2024-11-20 - Defer expensive GenServer state fetches on initial page load
 **Learning:** In Phoenix LiveView apps, fetching distributed GenServer state sequentially or in parallel during the disconnected HTTP render (`mount`) blocks the response and increases time-to-first-byte (TTFB), causing an N+1 bottleneck. This duplicate work is discarded when the WebSocket connects and triggers another `mount`.
 **Action:** When a LiveView depends on expensive operations like distributed state fetching, use `if connected?(socket)` in the `mount` callback to defer loading data until the stateful WebSocket connection is established, rendering a lightweight initial HTTP response.
+
+## 2024-12-10 - O(1) fetching of all GenServer states via Registry
+**Learning:** In Elixir, fetching state sequentially or in parallel from many processes (e.g. `Task.async_stream` with `GenServer.call`) incurs message queue processing overhead. By storing the process state directly in the Registry value via `Registry.update_value/3`, we can fetch all process states globally in a single O(1) native ETS match (`Registry.select`), completely bypassing GenServer message queues.
+**Action:** When you frequently need the state of many independent GenServers simultaneously, register the state in the Registry value and keep it updated, then fetch all states simultaneously via `Registry.select` to avoid N+1 process calls.
