@@ -86,13 +86,8 @@ defmodule ConvoSimWeb.DashboardLive do
   end
 
   defp load_conversations do
-    ConversationManager.list_conversations()
-    # ⚡ Bolt: Optimize sequential state fetching by loading in parallel
-    |> Task.async_stream(&ConversationManager.get_state/1,
-      max_concurrency: System.schedulers_online() * 2,
-      timeout: :infinity
-    )
-    |> Enum.map(fn {:ok, state} -> state end)
+    # ⚡ Bolt: Fetch all states natively from ETS in O(1) avoiding N+1 GenServer bottleneck
+    ConversationManager.list_all_states()
   end
 
   defp stream_delete_by_id(socket, stream_name, id) do

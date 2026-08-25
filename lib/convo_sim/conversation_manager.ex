@@ -61,6 +61,17 @@ defmodule ConvoSim.ConversationManager do
   end
 
   @doc """
+  Lists all active conversation states from the Registry directly.
+  By fetching from the Registry value, we avoid N+1 GenServer.call bottlenecks.
+  """
+  def list_all_states() do
+    # ⚡ Bolt: O(1) state fetching via native ETS match.
+    # The match spec `{{:_, :_, :"$1"}, [], [:"$1"]}` returns only the 3rd element
+    # of the registry tuple, which is the state value we populated.
+    Registry.select(ConvoSim.ConversationRegistry, [{{:_, :_, :"$1"}, [], [:"$1"]}])
+  end
+
+  @doc """
   Gets the state of a specific conversation by delegating to the Conversation process.
   """
   def get_state(id) do
