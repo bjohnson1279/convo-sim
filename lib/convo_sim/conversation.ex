@@ -32,15 +32,16 @@ defmodule ConvoSim.Conversation do
   @doc """
   Sends a message to the conversation.
   """
-  def send_message(id, content) do
-    # 🛡️ Sentinel: Enforce maximum message length to prevent memory exhaustion (DoS)
-    truncated_content = String.slice(content, 0, 4000)
-
+  def send_message(id, content) when byte_size(content) <= 4000 do
     # Using cast because we don't need to block waiting for the result.
     GenServer.cast(
       {:via, Registry, {ConvoSim.ConversationRegistry, id}},
-      {:customer_message, truncated_content}
+      {:customer_message, content}
     )
+  end
+
+  def send_message(_id, _content) do
+    {:error, :content_too_large}
   end
 
   # --- GenServer Callbacks ---
