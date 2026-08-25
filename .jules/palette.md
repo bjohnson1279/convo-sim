@@ -10,3 +10,7 @@
 ## 2024-08-25 - Dynamic Chat Message Accessibility
 **Learning:** For chat message containers in Phoenix LiveView apps where messages are appended dynamically, screen readers often fail to announce incoming messages.
 **Action:** Use `role="log"` and `aria-live="polite"` on the container to ensure screen readers properly announce incoming messages as they are dynamically appended without a full page reload.
+
+## 2024-11-20 - Chat Application Accessibility
+**Learning:** Chat messages appended dynamically are invisible to screen readers without specific ARIA attributes.
+**Action:** Always use \ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen readers announce incoming messages.
