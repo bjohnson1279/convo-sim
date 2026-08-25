@@ -22,3 +22,13 @@
 **Vulnerability:** High severity HTTP/2 connection-window starvation (CVE-2026-74836) and Medium severity header validation issues (CVE-2026-75484) in `bandit` v1.12.4.
 **Learning:** Outdated web server dependencies can expose the application to denial-of-service (DoS) and request smuggling attacks.
 **Prevention:** Regularly audit dependencies using tools like `mix hex.audit` (or other dependency audit tools) and apply security patches promptly.
+
+## 2026-08-25 - Log Injection Prevention
+**Vulnerability:** Unsanitized user input was interpolated directly into log messages, allowing potential log injection or manipulation of the terminal/log viewer.
+**Learning:** Raw string interpolation of user-provided data into logs is a dangerous vector. Even seemingly benign identifiers can carry malicious payloads like newline characters.
+**Prevention:** Always use `inspect/1` when logging untrusted user input to ensure it is safely encoded and escaped.
+
+## 2026-08-25 - Prevent DoS via Missing Input Length Limits
+**Vulnerability:** LiveView event handlers accepted arbitrarily large string identifiers without validation, posing a Denial of Service (DoS) risk through memory exhaustion.
+**Learning:** Relying on Cowboy or Plug to limit HTTP body sizes does not protect individual WebSocket event handlers or GenServer boundaries from massive string payloads. Furthermore, silently truncating these strings (e.g., via `String.slice/3`) is an anti-pattern as it does not prevent the initial memory allocation and introduces functional collision risks.
+**Prevention:** Enforce input length limits early at the event boundary using guard clauses (e.g., `when byte_size(id) <= 64`) and explicitly reject oversized payloads instead of silently truncating them.

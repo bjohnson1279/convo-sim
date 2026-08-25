@@ -48,6 +48,13 @@ defmodule ConvoSimWeb.DashboardLive do
   end
 
   @impl true
+  def handle_event("send_message", %{"id" => id}, socket) when byte_size(id) > 64 do
+    # 🛡️ Sentinel: Validate input and reject massive identifiers entirely to prevent memory DoS
+    Logger.warning("Rejected send_message: ID exceeds maximum length")
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("send_message", %{"id" => id}, socket) do
     default_messages = [
       "Hello, I need help with my account billing.",
@@ -64,6 +71,13 @@ defmodule ConvoSimWeb.DashboardLive do
   end
 
   @impl true
+  def handle_event("stop_conversation", %{"id" => id}, socket) when byte_size(id) > 64 do
+    # 🛡️ Sentinel: Validate input and reject massive identifiers entirely to prevent memory DoS
+    Logger.warning("Rejected stop_conversation: ID exceeds maximum length")
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("stop_conversation", %{"id" => id}, socket) do
     case ConversationManager.stop_conversation(id) do
       :ok ->
@@ -71,8 +85,8 @@ defmodule ConvoSimWeb.DashboardLive do
         {:noreply, stream_delete_by_id(socket, :conversations, id)}
 
       {:error, reason} ->
-        # 🛡️ Sentinel: Log internal error to avoid information leakage in UI
-        Logger.error("Failed to stop conversation #{id}: #{inspect(reason)}")
+        # 🛡️ Sentinel: Use inspect(id) to prevent log injection from unsanitized input
+        Logger.error("Failed to stop conversation #{inspect(id)}: #{inspect(reason)}")
 
         {:noreply,
          put_flash(socket, :error, "Failed to stop conversation. It may have already ended.")}
