@@ -14,3 +14,7 @@
 ## 2024-11-20 - Chat Application Accessibility
 **Learning:** Chat messages appended dynamically are invisible to screen readers without specific ARIA attributes.
 **Action:** Always use \ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen readers announce incoming messages.
+
+## 2026-08-26 - Decorative Icon Accessibility
+**Learning:** Decorative icons rendered as spans or SVGs without `aria-hidden="true"` can confuse screen readers by reading out obscure class names or creating extra stops.
+**Action:** Always add `aria-hidden="true"` to core icon components so screen readers ignore them and read the parent element's text or `aria-label` instead.
