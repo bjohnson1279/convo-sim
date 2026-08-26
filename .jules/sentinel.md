@@ -32,3 +32,8 @@
 **Vulnerability:** LiveView event handlers accepted arbitrarily large string identifiers without validation, posing a Denial of Service (DoS) risk through memory exhaustion.
 **Learning:** Relying on Cowboy or Plug to limit HTTP body sizes does not protect individual WebSocket event handlers or GenServer boundaries from massive string payloads. Furthermore, silently truncating these strings (e.g., via `String.slice/3`) is an anti-pattern as it does not prevent the initial memory allocation and introduces functional collision risks.
 **Prevention:** Enforce input length limits early at the event boundary using guard clauses (e.g., `when byte_size(id) <= 64`) and explicitly reject oversized payloads instead of silently truncating them.
+
+## 2026-08-26 - Missing Rate Limiting in LiveView Events
+**Vulnerability:** LiveView event handlers like `spawn_conversation` were missing rate limiting, allowing a user to spam the event and spawn maximum processes instantly (DoS).
+**Learning:** LiveView events over WebSockets do not have built-in rate limiting like Plug might provide for HTTP requests. Any resource-intensive event can be trivially spammed.
+**Prevention:** Implement rate limiting manually within the LiveView by tracking the last event timestamp in the socket assigns (e.g. `socket.assigns.last_event_time`) and checking the elapsed time with `System.system_time(:millisecond)`.
