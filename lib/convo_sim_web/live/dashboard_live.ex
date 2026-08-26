@@ -21,29 +21,40 @@ defmodule ConvoSimWeb.DashboardLive do
     {:ok,
      socket
      |> assign(:page_title, "Conversation Simulator")
+     |> assign(:last_spawn_time, 0)
      |> stream(:conversations, conversations)}
   end
 
   @impl true
   def handle_event("spawn_conversation", _params, socket) do
-    case ConversationManager.start_conversation() do
-      {:ok, _id} ->
-        {:noreply, put_flash(socket, :info, "Started new conversation")}
+    now = System.system_time(:millisecond)
+    last_spawn = socket.assigns.last_spawn_time
 
-      {:error, :too_many_conversations} ->
-        Logger.warning("Maximum conversation limit reached (50)")
+    if now - last_spawn < 1000 do
+      Logger.warning("Rate limit exceeded for spawn_conversation")
+      {:noreply, put_flash(socket, :error, "Please wait a moment before spawning another conversation.")}
+    else
+      socket = assign(socket, :last_spawn_time, now)
 
-        {:noreply,
-         put_flash(
-           socket,
-           :error,
-           "Maximum limit of 50 active conversations reached. Please stop an existing conversation first."
-         )}
+      case ConversationManager.start_conversation() do
+        {:ok, _id} ->
+          {:noreply, put_flash(socket, :info, "Started new conversation")}
 
-      {:error, reason} ->
-        # 🛡️ Sentinel: Log internal error to avoid information leakage in UI
-        Logger.error("Failed to start conversation: #{inspect(reason)}")
-        {:noreply, put_flash(socket, :error, "Failed to start conversation. Please try again.")}
+        {:error, :too_many_conversations} ->
+          Logger.warning("Maximum conversation limit reached (50)")
+
+          {:noreply,
+           put_flash(
+             socket,
+             :error,
+             "Maximum limit of 50 active conversations reached. Please stop an existing conversation first."
+           )}
+
+        {:error, reason} ->
+          # 🛡️ Sentinel: Log internal error to avoid information leakage in UI
+          Logger.error("Failed to start conversation: #{inspect(reason)}")
+          {:noreply, put_flash(socket, :error, "Failed to start conversation. Please try again.")}
+      end
     end
   end
 
