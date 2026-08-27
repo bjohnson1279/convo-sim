@@ -22,6 +22,7 @@ defmodule ConvoSimWeb.DashboardLive do
      socket
      |> assign(:page_title, "Conversation Simulator")
      |> assign(:last_spawn_time, 0)
+     |> assign(:last_message_time, 0)
      |> stream(:conversations, conversations)}
   end
 
@@ -32,7 +33,9 @@ defmodule ConvoSimWeb.DashboardLive do
 
     if now - last_spawn < 1000 do
       Logger.warning("Rate limit exceeded for spawn_conversation")
-      {:noreply, put_flash(socket, :error, "Please wait a moment before spawning another conversation.")}
+
+      {:noreply,
+       put_flash(socket, :error, "Please wait a moment before spawning another conversation.")}
     else
       socket = assign(socket, :last_spawn_time, now)
 
@@ -67,18 +70,30 @@ defmodule ConvoSimWeb.DashboardLive do
 
   @impl true
   def handle_event("send_message", %{"id" => id}, socket) do
-    default_messages = [
-      "Hello, I need help with my account billing.",
-      "Can I change my subscription plan?",
-      "My order hasn't arrived yet, where is it?",
-      "Is there a discount available for annual plans?",
-      "I am having trouble logging into my account."
-    ]
+    now = System.system_time(:millisecond)
+    last_msg = socket.assigns.last_message_time
 
-    sample_msg = Enum.random(default_messages)
-    ConvoSim.Conversation.send_message(id, sample_msg)
+    if now - last_msg < 1000 do
+      Logger.warning("Rate limit exceeded for send_message")
 
-    {:noreply, socket}
+      {:noreply,
+       put_flash(socket, :error, "Please wait a moment before sending another message.")}
+    else
+      socket = assign(socket, :last_message_time, now)
+
+      default_messages = [
+        "Hello, I need help with my account billing.",
+        "Can I change my subscription plan?",
+        "My order hasn't arrived yet, where is it?",
+        "Is there a discount available for annual plans?",
+        "I am having trouble logging into my account."
+      ]
+
+      sample_msg = Enum.random(default_messages)
+      ConvoSim.Conversation.send_message(id, sample_msg)
+
+      {:noreply, socket}
+    end
   end
 
   @impl true
@@ -132,12 +147,12 @@ defmodule ConvoSimWeb.DashboardLive do
               <.icon name="hero-chat-bubble-left-right" class="w-7 h-7 text-indigo-400" />
               Real-Time Conversation Simulator
             </h1>
-            
+
             <p class="text-sm text-slate-400 mt-1">
               Demonstrating OTP concurrency — each conversation is an isolated BEAM process.
             </p>
           </div>
-          
+
           <div>
             <button
               id="spawn-convo-btn"
@@ -149,7 +164,7 @@ defmodule ConvoSimWeb.DashboardLive do
             </button>
           </div>
         </div>
-         <%!-- Conversation Cards Grid --%>
+        <%!-- Conversation Cards Grid --%>
         <div
           id="conversations"
           phx-update="stream"
@@ -161,11 +176,11 @@ defmodule ConvoSimWeb.DashboardLive do
           >
             <.icon name="hero-chat-bubble-oval-left" class="w-12 h-12 text-slate-600 mb-3" />
             <h3 class="text-base font-semibold text-slate-300">No Active Conversations</h3>
-            
+
             <p class="text-sm text-slate-500 mt-1 max-w-sm mb-4">
               Launch lightweight GenServer processes on the BEAM VM to get started.
             </p>
-            
+
             <button
               id="empty-state-spawn-btn"
               phx-click="spawn_conversation"
@@ -175,7 +190,7 @@ defmodule ConvoSimWeb.DashboardLive do
               <.icon name="hero-plus" class="w-4 h-4" /> Spawn Conversation
             </button>
           </div>
-          
+
           <div
             :for={{dom_id, convo} <- @streams.conversations}
             id={dom_id}
@@ -187,12 +202,12 @@ defmodule ConvoSimWeb.DashboardLive do
                 <span class="font-mono text-xs font-semibold px-2.5 py-1 bg-slate-800 text-indigo-300 rounded-lg border border-slate-700/50">
                   {convo.id}
                 </span>
-                
+
                 <span class="text-xs text-slate-500">
                   <%!-- ⚡ Bolt: Use O(1) cached message_count instead of O(N) length() --%> {convo.message_count} msgs
                 </span>
               </div>
-               <%!-- Status Pill --%>
+              <%!-- Status Pill --%>
               <div aria-live="polite" aria-atomic="true">
                 <%= if convo.status == :responding do %>
                   <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse">
@@ -205,7 +220,7 @@ defmodule ConvoSimWeb.DashboardLive do
                 <% end %>
               </div>
             </div>
-             <%!-- Messages Scroll Box --%>
+            <%!-- Messages Scroll Box --%>
             <%!-- ⚡ Bolt: Use flex-col-reverse to offload O(N) message ordering from BEAM to CSS natively --%>
             <div
               class="flex-1 my-4 flex flex-col-reverse gap-3 min-h-[160px] max-h-[240px] overflow-y-auto pr-1 text-xs scrollbar-thin"
@@ -228,13 +243,13 @@ defmodule ConvoSimWeb.DashboardLive do
                     <div class="font-semibold text-[10px] uppercase tracking-wider mb-1 opacity-70">
                       {if(msg.role == :customer, do: "Customer", else: "AI Assistant")}
                     </div>
-                    
+
                     <div>{msg.content}</div>
                   </div>
                 <% end %>
               <% end %>
             </div>
-             <%!-- Card Actions --%>
+            <%!-- Card Actions --%>
             <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
               <button
                 id={"send-btn-#{convo.id}"}
@@ -252,7 +267,7 @@ defmodule ConvoSimWeb.DashboardLive do
               >
                 <.icon name="hero-paper-airplane" class="w-3.5 h-3.5" /> Send Customer Message
               </button>
-              
+
               <button
                 id={"stop-btn-#{convo.id}"}
                 phx-click="stop_conversation"
