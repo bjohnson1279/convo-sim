@@ -18,3 +18,7 @@
 ## 2026-08-26 - Decorative Icon Accessibility
 **Learning:** Decorative icons rendered as spans or SVGs without `aria-hidden="true"` can confuse screen readers by reading out obscure class names or creating extra stops.
 **Action:** Always add `aria-hidden="true"` to core icon components so screen readers ignore them and read the parent element's text or `aria-label` instead.
+
+## 2026-08-27 - Semantic Lists for Grids
+**Learning:** Sighted users can see a grid of cards as a collection, but screen reader users lose this context if the container is just a `div`. Additionally, Safari removes list semantics from `ul` elements when `list-style: none` is applied (which Tailwind does by default).
+**Action:** Always use `ul` with `role="list"` for the container and `li` for the items when rendering a grid or list of repeated cards, so screen readers properly announce the collection size and boundaries.
