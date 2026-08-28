@@ -165,12 +165,13 @@ defmodule ConvoSimWeb.DashboardLive do
           </div>
         </div>
         <%!-- Conversation Cards Grid --%>
-        <div
+        <ul
           id="conversations"
           phx-update="stream"
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          role="list"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 list-none p-0"
         >
-          <div
+          <li
             id="empty-state"
             class="hidden only:flex col-span-full flex-col items-center justify-center p-12 text-center bg-slate-900/50 border border-dashed border-slate-800 rounded-2xl"
           >
@@ -189,9 +190,9 @@ defmodule ConvoSimWeb.DashboardLive do
             >
               <.icon name="hero-plus" class="w-4 h-4" /> Spawn Conversation
             </button>
-          </div>
+          </li>
 
-          <div
+          <li
             :for={{dom_id, convo} <- @streams.conversations}
             id={dom_id}
             class="flex flex-col bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg transition hover:border-slate-700"
@@ -204,7 +205,8 @@ defmodule ConvoSimWeb.DashboardLive do
                 </span>
 
                 <span class="text-xs text-slate-500">
-                  <%!-- ⚡ Bolt: Use O(1) cached message_count instead of O(N) length() --%> {convo.message_count} msgs
+                  <%!-- ⚡ Bolt: Use O(1) cached message_count instead of O(N) length() --%> {convo.message_count}
+                  <span aria-hidden="true">msgs</span><span class="sr-only">messages</span>
                 </span>
               </div>
               <%!-- Status Pill --%>
@@ -281,8 +283,8 @@ defmodule ConvoSimWeb.DashboardLive do
                 <.icon name="hero-trash" class="w-3.5 h-3.5" />
               </button>
             </div>
-          </div>
-        </div>
+          </li>
+        </ul>
       </div>
     </Layouts.app>
     """
