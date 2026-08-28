@@ -13,7 +13,8 @@
 
 ## 2024-11-20 - Chat Application Accessibility
 **Learning:** Chat messages appended dynamically are invisible to screen readers without specific ARIA attributes.
-**Action:** Always use \ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen readers announce incoming messages.
+**Action:** Always use \
+ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen readers announce incoming messages.
 
 ## 2026-08-26 - Decorative Icon Accessibility
 **Learning:** Decorative icons rendered as spans or SVGs without `aria-hidden="true"` can confuse screen readers by reading out obscure class names or creating extra stops.
@@ -22,3 +23,6 @@
 ## 2026-08-27 - Semantic Lists for Grids
 **Learning:** Sighted users can see a grid of cards as a collection, but screen reader users lose this context if the container is just a `div`. Additionally, Safari removes list semantics from `ul` elements when `list-style: none` is applied (which Tailwind does by default).
 **Action:** Always use `ul` with `role="list"` for the container and `li` for the items when rendering a grid or list of repeated cards, so screen readers properly announce the collection size and boundaries.
+## 2024-06-25 - [Accessibility Improvements]
+**Learning:** For screen readers, raw abbreviations (like "msgs") and visually-styled collections without semantic list tags can hinder navigation and comprehension. Tailwind's `list-style: none` removes list semantics in Safari, so explicit `role="list"` and `<li>` elements are necessary to preserve accessibility.
+**Action:** Use `<ul role="list">` and `<li>` tags for collections instead of purely nested `<div>`s, and ensure visual abbreviations are accompanied by full screen-reader text using `aria-hidden="true"` and `<span class="sr-only">`.

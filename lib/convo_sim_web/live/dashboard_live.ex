@@ -5,6 +5,16 @@ defmodule ConvoSimWeb.DashboardLive do
 
   alias ConvoSim.ConversationManager
 
+  # ⚡ Bolt: Extract static default_messages to a module attribute evaluated at compile-time.
+  # This prevents memory allocation and garbage collection of this list on every `send_message` event.
+  @default_messages [
+    "Hello, I need help with my account billing.",
+    "Can I change my subscription plan?",
+    "My order hasn't arrived yet, where is it?",
+    "Is there a discount available for annual plans?",
+    "I am having trouble logging into my account."
+  ]
+
   @impl true
   def mount(_params, _session, socket) do
     # Only subscribe if connected to avoid subscribing twice (HTTP mount + WebSocket mount)
@@ -22,6 +32,7 @@ defmodule ConvoSimWeb.DashboardLive do
      socket
      |> assign(:page_title, "Conversation Simulator")
      |> assign(:last_spawn_time, 0)
+     |> assign(:last_message_time, 0)
      |> stream(:conversations, conversations)}
   end
 
@@ -69,18 +80,35 @@ defmodule ConvoSimWeb.DashboardLive do
 
   @impl true
   def handle_event("send_message", %{"id" => id}, socket) do
-    default_messages = [
-      "Hello, I need help with my account billing.",
-      "Can I change my subscription plan?",
-      "My order hasn't arrived yet, where is it?",
-      "Is there a discount available for annual plans?",
-      "I am having trouble logging into my account."
-    ]
-
-    sample_msg = Enum.random(default_messages)
+<<<<<<< HEAD
+    sample_msg = Enum.random(@default_messages)
     ConvoSim.Conversation.send_message(id, sample_msg)
+=======
+    now = System.system_time(:millisecond)
+    last_msg = socket.assigns.last_message_time
 
-    {:noreply, socket}
+    if now - last_msg < 1000 do
+      Logger.warning("Rate limit exceeded for send_message")
+>>>>>>> origin/master
+
+      {:noreply,
+       put_flash(socket, :error, "Please wait a moment before sending another message.")}
+    else
+      socket = assign(socket, :last_message_time, now)
+
+      default_messages = [
+        "Hello, I need help with my account billing.",
+        "Can I change my subscription plan?",
+        "My order hasn't arrived yet, where is it?",
+        "Is there a discount available for annual plans?",
+        "I am having trouble logging into my account."
+      ]
+
+      sample_msg = Enum.random(default_messages)
+      ConvoSim.Conversation.send_message(id, sample_msg)
+
+      {:noreply, socket}
+    end
   end
 
   @impl true
@@ -155,8 +183,13 @@ defmodule ConvoSimWeb.DashboardLive do
         <ul
           id="conversations"
           phx-update="stream"
+<<<<<<< HEAD
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
           role="list"
+=======
+          role="list"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 list-none p-0"
+>>>>>>> origin/master
         >
           <li
             id="empty-state"
