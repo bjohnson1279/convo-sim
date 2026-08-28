@@ -1,5 +1,5 @@
 defmodule ConvoSimWeb.DashboardLiveTest do
-  use ConvoSimWeb.ConnCase, async: true
+  use ConvoSimWeb.ConnCase, async: false
 
   import Phoenix.LiveViewTest
 
