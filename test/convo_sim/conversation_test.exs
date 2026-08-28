@@ -1,5 +1,5 @@
 defmodule ConvoSim.ConversationTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias ConvoSim.Conversation
   alias ConvoSim.ConversationManager
@@ -39,10 +39,12 @@ defmodule ConvoSim.ConversationTest do
 
     mock_pids =
       for i <- 1..needed do
-        {:ok, pid} = Task.start(fn ->
-          Registry.register(ConvoSim.ConversationRegistry, "mock-limit-#{i}", :ok)
-          Process.sleep(:infinity)
-        end)
+        {:ok, pid} =
+          Task.start(fn ->
+            Registry.register(ConvoSim.ConversationRegistry, "mock-limit-#{i}", :ok)
+            Process.sleep(:infinity)
+          end)
+
         pid
       end
 
