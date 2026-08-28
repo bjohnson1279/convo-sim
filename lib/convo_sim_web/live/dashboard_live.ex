@@ -5,6 +5,16 @@ defmodule ConvoSimWeb.DashboardLive do
 
   alias ConvoSim.ConversationManager
 
+  # ⚡ Bolt: Extract static default_messages to a module attribute evaluated at compile-time.
+  # This prevents memory allocation and garbage collection of this list on every `send_message` event.
+  @default_messages [
+    "Hello, I need help with my account billing.",
+    "Can I change my subscription plan?",
+    "My order hasn't arrived yet, where is it?",
+    "Is there a discount available for annual plans?",
+    "I am having trouble logging into my account."
+  ]
+
   @impl true
   def mount(_params, _session, socket) do
     # Only subscribe if connected to avoid subscribing twice (HTTP mount + WebSocket mount)
@@ -67,15 +77,7 @@ defmodule ConvoSimWeb.DashboardLive do
 
   @impl true
   def handle_event("send_message", %{"id" => id}, socket) do
-    default_messages = [
-      "Hello, I need help with my account billing.",
-      "Can I change my subscription plan?",
-      "My order hasn't arrived yet, where is it?",
-      "Is there a discount available for annual plans?",
-      "I am having trouble logging into my account."
-    ]
-
-    sample_msg = Enum.random(default_messages)
+    sample_msg = Enum.random(@default_messages)
     ConvoSim.Conversation.send_message(id, sample_msg)
 
     {:noreply, socket}
