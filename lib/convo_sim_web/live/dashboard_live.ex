@@ -32,7 +32,7 @@ defmodule ConvoSimWeb.DashboardLive do
      socket
      |> assign(:page_title, "Conversation Simulator")
      |> assign(:last_spawn_time, 0)
-     |> assign(:last_message_time, 0)
+     |> assign(:last_message_times, %{})
      |> stream(:conversations, conversations)}
   end
 
@@ -81,15 +81,20 @@ defmodule ConvoSimWeb.DashboardLive do
   @impl true
   def handle_event("send_message", %{"id" => id}, socket) do
     now = System.system_time(:millisecond)
-    last_msg = socket.assigns.last_message_time
+    last_msg = Map.get(socket.assigns.last_message_times, id, 0)
 
     if now - last_msg < 1000 do
-      Logger.warning("Rate limit exceeded for send_message")
+      Logger.warning("Rate limit exceeded for send_message on conversation #{inspect(id)}")
 
       {:noreply,
-       put_flash(socket, :error, "Please wait a moment before sending another message.")}
+       put_flash(
+         socket,
+         :error,
+         "Please wait a moment before sending another message to this conversation."
+       )}
     else
-      socket = assign(socket, :last_message_time, now)
+      new_last_message_times = Map.put(socket.assigns.last_message_times, id, now)
+      socket = assign(socket, :last_message_times, new_last_message_times)
 
       sample_msg = Enum.random(@default_messages)
       ConvoSim.Conversation.send_message(id, sample_msg)
