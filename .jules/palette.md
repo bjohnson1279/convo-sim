@@ -21,3 +21,6 @@
 ## 2024-06-25 - [Accessibility Improvements]
 **Learning:** For screen readers, raw abbreviations (like "msgs") and visually-styled collections without semantic list tags can hinder navigation and comprehension. Tailwind's `list-style: none` removes list semantics in Safari, so explicit `role="list"` and `<li>` elements are necessary to preserve accessibility.
 **Action:** Use `<ul role="list">` and `<li>` tags for collections instead of purely nested `<div>`s, and ensure visual abbreviations are accompanied by full screen-reader text using `aria-hidden="true"` and `<span class="sr-only">`.
+## 2026-08-31 - [Visual Indicator Positioning in flex-col-reverse]
+**Learning:** When adding a dynamic visual indicator (like a typing bubble) to a `flex-col-reverse` container where items are prepended in the DOM (newest first), the indicator must be placed *before* the message loop in the DOM in order for it to render at the *bottom* visually. `flex-col-reverse` displays the first child in the DOM at the bottom of the container.
+**Action:** Always place newly appended visual elements *before* the loop in the template for `flex-col-reverse` chat containers.

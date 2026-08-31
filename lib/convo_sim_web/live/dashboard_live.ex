@@ -251,6 +251,27 @@ defmodule ConvoSimWeb.DashboardLive do
                     <div>{msg.content}</div>
                   </div>
                 <% end %>
+                <%= if convo.status == :responding do %>
+                  <div
+                    aria-hidden="true"
+                    class="mr-auto bg-slate-800/90 border border-slate-700/50 text-slate-200 p-3 rounded-xl max-w-[85%] flex flex-col gap-1"
+                  >
+                    <div class="font-semibold text-[10px] uppercase tracking-wider opacity-70">
+                      AI Assistant
+                    </div>
+                    <div class="flex gap-1 items-center h-4 py-1">
+                      <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-pulse"></span>
+                      <span
+                        class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-pulse"
+                        style="animation-delay: 150ms"
+                      ></span>
+                      <span
+                        class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-pulse"
+                        style="animation-delay: 300ms"
+                      ></span>
+                    </div>
+                  </div>
+                <% end %>
               <% end %>
             </div>
             <%!-- Card Actions --%>
