@@ -25,8 +25,19 @@ defmodule ConvoSim.Conversation do
   Gets the current state of a conversation by id.
   """
   def get_state(id) do
-    # We construct the same via tuple to find the process and send it a synchronous message
-    GenServer.call({:via, Registry, {ConvoSim.ConversationRegistry, id}}, :get_state)
+    # ⚡ Bolt: O(1) state fetching via native ETS lookup.
+    # Instead of sending a synchronous GenServer.call and blocking on the process's message queue,
+    # we can fetch the state directly from the Registry value since we keep it updated there.
+    case Registry.lookup(ConvoSim.ConversationRegistry, id) do
+      [{_pid, state}] ->
+        state
+
+      [] ->
+        # Fallback for process not found or error cases
+        # If the registry is empty, we must fallback to the original GenServer.call
+        # so it fails with a noproc exit as expected by the existing API contract.
+        GenServer.call({:via, Registry, {ConvoSim.ConversationRegistry, id}}, :get_state)
+    end
   end
 
   @doc """
