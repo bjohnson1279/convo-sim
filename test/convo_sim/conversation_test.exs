@@ -16,6 +16,11 @@ defmodule ConvoSim.ConversationTest do
     # Send customer message
     Conversation.send_message(id, "Hello test")
 
+    # Because send_message is an asynchronous GenServer.cast, the test process might race ahead
+    # before the GenServer updates its state in the Registry.
+    # For testing, we can sync by doing a sys.get_state which blocks until the queue is processed
+    _ = :sys.get_state(Registry.lookup(ConvoSim.ConversationRegistry, id) |> hd() |> elem(0))
+
     state = ConversationManager.get_state(id)
     assert state.status == :responding
     assert length(state.messages) == 1
