@@ -1,0 +1,39 @@
+diff --git a/.jules/palette.md b/.jules/palette.md
+index d6bded6..b5a1a1e 100644
+--- a/.jules/palette.md
++++ b/.jules/palette.md
+@@ -21,3 +21,6 @@
+ ## 2024-06-25 - [Accessibility Improvements]
+ **Learning:** For screen readers, raw abbreviations (like "msgs") and visually-styled collections without semantic list tags can hinder navigation and comprehension. Tailwind's `list-style: none` removes list semantics in Safari, so explicit `role="list"` and `<li>` elements are necessary to preserve accessibility.
+ **Action:** Use `<ul role="list">` and `<li>` tags for collections instead of purely nested `<div>`s, and ensure visual abbreviations are accompanied by full screen-reader text using `aria-hidden="true"` and `<span class="sr-only">`.
++## 2024-11-20 - In-Context Visual Typing Indicator in UI
++**Learning:** When using Tailwind CSS `flex-col-reverse` for newest-first chat ordering natively, placing the typing indicator HTML element *before* the message loop ensures it renders visually at the bottom. Adding `aria-hidden="true"` to this typing bubble is critical to prevent screen readers from announcing it redundantly when a global `aria-live` region (like a status pill) is already broadcasting the "AI Responding..." state.
++**Action:** Always check the direction of flex containers (`flex-col-reverse` vs `flex-col`) before inserting temporary visual state elements like typing indicators. Additionally, audit `aria-live` regions on the page to prevent duplicate screen reader announcements by silencing visual-only indicators with `aria-hidden="true"`.
+diff --git a/lib/convo_sim_web/live/dashboard_live.ex b/lib/convo_sim_web/live/dashboard_live.ex
+index bd75dc4..aaae4b8 100644
+--- a/lib/convo_sim_web/live/dashboard_live.ex
++++ b/lib/convo_sim_web/live/dashboard_live.ex
+@@ -231,7 +231,22 @@ defmodule ConvoSimWeb.DashboardLive do
+               role="log"
+               aria-live="polite"
+             >
+-              <%= if convo.messages == [] do %>
++              <%= if convo.status == :responding do %>
++                <div
++                  class="mr-auto bg-slate-800/90 border border-slate-700/50 text-slate-200 p-3 rounded-xl max-w-[85%]"
++                  aria-hidden="true"
++                >
++                  <div class="font-semibold text-[10px] uppercase tracking-wider mb-1 opacity-70">
++                    AI Assistant
++                  </div>
++                  <div class="flex gap-1 py-1">
++                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
++                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
++                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
++                  </div>
++                </div>
++              <% end %>
++              <%= if convo.messages == [] and convo.status != :responding do %>
+                 <div class="h-full flex items-center justify-center text-slate-600 italic">
+                   No messages yet. Click "Send Message".
+                 </div>

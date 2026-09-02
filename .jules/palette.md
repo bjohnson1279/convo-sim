@@ -13,7 +13,8 @@
 
 ## 2024-11-20 - Chat Application Accessibility
 **Learning:** Chat messages appended dynamically are invisible to screen readers without specific ARIA attributes.
-**Action:** Always use \ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen readers announce incoming messages.
+**Action:** Always use \
+ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen readers announce incoming messages.
 
 ## 2026-08-26 - Decorative Icon Accessibility
 **Learning:** Decorative icons rendered as spans or SVGs without `aria-hidden="true"` can confuse screen readers by reading out obscure class names or creating extra stops.
@@ -24,3 +25,6 @@
 ## 2026-08-31 - [Visual Indicator Positioning in flex-col-reverse]
 **Learning:** When adding a dynamic visual indicator (like a typing bubble) to a `flex-col-reverse` container where items are prepended in the DOM (newest first), the indicator must be placed *before* the message loop in the DOM in order for it to render at the *bottom* visually. `flex-col-reverse` displays the first child in the DOM at the bottom of the container.
 **Action:** Always place newly appended visual elements *before* the loop in the template for `flex-col-reverse` chat containers.
+## 2024-11-20 - In-Context Visual Typing Indicator in UI
+**Learning:** When using Tailwind CSS `flex-col-reverse` for newest-first chat ordering natively, placing the typing indicator HTML element *before* the message loop ensures it renders visually at the bottom. Adding `aria-hidden="true"` to this typing bubble is critical to prevent screen readers from announcing it redundantly when a global `aria-live` region (like a status pill) is already broadcasting the "AI Responding..." state.
+**Action:** Always check the direction of flex containers (`flex-col-reverse` vs `flex-col`) before inserting temporary visual state elements like typing indicators. Additionally, audit `aria-live` regions on the page to prevent duplicate screen reader announcements by silencing visual-only indicators with `aria-hidden="true"`.

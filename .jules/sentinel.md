@@ -37,3 +37,7 @@
 **Vulnerability:** LiveView event handlers like `spawn_conversation` were missing rate limiting, allowing a user to spam the event and spawn maximum processes instantly (DoS).
 **Learning:** LiveView events over WebSockets do not have built-in rate limiting like Plug might provide for HTTP requests. Any resource-intensive event can be trivially spammed.
 **Prevention:** Implement rate limiting manually within the LiveView by tracking the last event timestamp in the socket assigns (e.g. `socket.assigns.last_event_time`) and checking the elapsed time with `System.system_time(:millisecond)`.
+## 2024-05-18 - GenServer queue buildup (DoS) via global WebSocket rate limiting
+**Vulnerability:** A global rate limit implementation on a WebSocket event (`send_message`) allowed users to be rate-limited out of sending messages on independent conversations because the rate limiter checked a single, shared state tracking the last message time across all conversations.
+**Learning:** In highly concurrent environments like Elixir's Phoenix LiveView, applying a global limit where a per-entity (e.g. per-conversation) limit is needed can break isolation and create an inadvertent DoS vector where rapid actions on one entity block legitimate actions on another.
+**Prevention:** Always scope rate limiting to the entity level (e.g. using a map `%{id => timestamp}`) when dealing with decoupled processes (like individual GenServers) in a LiveView WebSocket context.

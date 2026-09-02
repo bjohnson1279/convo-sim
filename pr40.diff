@@ -1,0 +1,54 @@
+diff --git a/lib/convo_sim_web/live/dashboard_live.ex b/lib/convo_sim_web/live/dashboard_live.ex
+index cc4d588..bd75dc4 100644
+--- a/lib/convo_sim_web/live/dashboard_live.ex
++++ b/lib/convo_sim_web/live/dashboard_live.ex
+@@ -80,31 +80,18 @@ defmodule ConvoSimWeb.DashboardLive do
+ 
+   @impl true
+   def handle_event("send_message", %{"id" => id}, socket) do
+-<<<<<<< HEAD
+-    sample_msg = Enum.random(@default_messages)
+-    ConvoSim.Conversation.send_message(id, sample_msg)
+-=======
+     now = System.system_time(:millisecond)
+     last_msg = socket.assigns.last_message_time
+ 
+     if now - last_msg < 1000 do
+       Logger.warning("Rate limit exceeded for send_message")
+->>>>>>> origin/master
+ 
+       {:noreply,
+        put_flash(socket, :error, "Please wait a moment before sending another message.")}
+     else
+       socket = assign(socket, :last_message_time, now)
+ 
+-      default_messages = [
+-        "Hello, I need help with my account billing.",
+-        "Can I change my subscription plan?",
+-        "My order hasn't arrived yet, where is it?",
+-        "Is there a discount available for annual plans?",
+-        "I am having trouble logging into my account."
+-      ]
+-
+-      sample_msg = Enum.random(default_messages)
++      sample_msg = Enum.random(@default_messages)
+       ConvoSim.Conversation.send_message(id, sample_msg)
+ 
+       {:noreply, socket}
+diff --git a/lib/convo_sim_web/router.ex b/lib/convo_sim_web/router.ex
+index e5941e5..7014817 100644
+--- a/lib/convo_sim_web/router.ex
++++ b/lib/convo_sim_web/router.ex
+@@ -7,7 +7,11 @@ defmodule ConvoSimWeb.Router do
+     plug :fetch_live_flash
+     plug :put_root_layout, html: {ConvoSimWeb.Layouts, :root}
+     plug :protect_from_forgery
+-    plug :put_secure_browser_headers
++
++    plug :put_secure_browser_headers, %{
++      "content-security-policy" =>
++        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' ws: wss:;"
++    }
+   end
+ 
+   pipeline :api do

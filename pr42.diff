@@ -1,0 +1,50 @@
+diff --git a/.jules/sentinel.md b/.jules/sentinel.md
+index 95ce7d0..fde943a 100644
+--- a/.jules/sentinel.md
++++ b/.jules/sentinel.md
+@@ -37,3 +37,7 @@
+ **Vulnerability:** LiveView event handlers like `spawn_conversation` were missing rate limiting, allowing a user to spam the event and spawn maximum processes instantly (DoS).
+ **Learning:** LiveView events over WebSockets do not have built-in rate limiting like Plug might provide for HTTP requests. Any resource-intensive event can be trivially spammed.
+ **Prevention:** Implement rate limiting manually within the LiveView by tracking the last event timestamp in the socket assigns (e.g. `socket.assigns.last_event_time`) and checking the elapsed time with `System.system_time(:millisecond)`.
++## 2024-05-18 - GenServer queue buildup (DoS) via global WebSocket rate limiting
++**Vulnerability:** A global rate limit implementation on a WebSocket event (`send_message`) allowed users to be rate-limited out of sending messages on independent conversations because the rate limiter checked a single, shared state tracking the last message time across all conversations.
++**Learning:** In highly concurrent environments like Elixir's Phoenix LiveView, applying a global limit where a per-entity (e.g. per-conversation) limit is needed can break isolation and create an inadvertent DoS vector where rapid actions on one entity block legitimate actions on another.
++**Prevention:** Always scope rate limiting to the entity level (e.g. using a map `%{id => timestamp}`) when dealing with decoupled processes (like individual GenServers) in a LiveView WebSocket context.
+diff --git a/lib/convo_sim_web/live/dashboard_live.ex b/lib/convo_sim_web/live/dashboard_live.ex
+index bd75dc4..b8ca4c6 100644
+--- a/lib/convo_sim_web/live/dashboard_live.ex
++++ b/lib/convo_sim_web/live/dashboard_live.ex
+@@ -32,7 +32,7 @@ defmodule ConvoSimWeb.DashboardLive do
+      socket
+      |> assign(:page_title, "Conversation Simulator")
+      |> assign(:last_spawn_time, 0)
+-     |> assign(:last_message_time, 0)
++     |> assign(:last_message_times, %{})
+      |> stream(:conversations, conversations)}
+   end
+ 
+@@ -81,15 +81,20 @@ defmodule ConvoSimWeb.DashboardLive do
+   @impl true
+   def handle_event("send_message", %{"id" => id}, socket) do
+     now = System.system_time(:millisecond)
+-    last_msg = socket.assigns.last_message_time
++    last_msg = Map.get(socket.assigns.last_message_times, id, 0)
+ 
+     if now - last_msg < 1000 do
+-      Logger.warning("Rate limit exceeded for send_message")
++      Logger.warning("Rate limit exceeded for send_message on conversation #{inspect(id)}")
+ 
+       {:noreply,
+-       put_flash(socket, :error, "Please wait a moment before sending another message.")}
++       put_flash(
++         socket,
++         :error,
++         "Please wait a moment before sending another message to this conversation."
++       )}
+     else
+-      socket = assign(socket, :last_message_time, now)
++      new_last_message_times = Map.put(socket.assigns.last_message_times, id, now)
++      socket = assign(socket, :last_message_times, new_last_message_times)
+ 
+       sample_msg = Enum.random(@default_messages)
+       ConvoSim.Conversation.send_message(id, sample_msg)

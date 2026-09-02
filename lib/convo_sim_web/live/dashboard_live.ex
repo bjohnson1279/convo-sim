@@ -32,7 +32,7 @@ defmodule ConvoSimWeb.DashboardLive do
      socket
      |> assign(:page_title, "Conversation Simulator")
      |> assign(:last_spawn_time, 0)
-     |> assign(:last_message_time, 0)
+     |> assign(:last_message_times, %{})
      |> stream(:conversations, conversations)}
   end
 
@@ -81,15 +81,20 @@ defmodule ConvoSimWeb.DashboardLive do
   @impl true
   def handle_event("send_message", %{"id" => id}, socket) do
     now = System.system_time(:millisecond)
-    last_msg = socket.assigns.last_message_time
+    last_msg = Map.get(socket.assigns.last_message_times, id, 0)
 
     if now - last_msg < 1000 do
-      Logger.warning("Rate limit exceeded for send_message")
+      Logger.warning("Rate limit exceeded for send_message on conversation #{inspect(id)}")
 
       {:noreply,
-       put_flash(socket, :error, "Please wait a moment before sending another message.")}
+       put_flash(
+         socket,
+         :error,
+         "Please wait a moment before sending another message to this conversation."
+       )}
     else
-      socket = assign(socket, :last_message_time, now)
+      new_last_message_times = Map.put(socket.assigns.last_message_times, id, now)
+      socket = assign(socket, :last_message_times, new_last_message_times)
 
       sample_msg = Enum.random(@default_messages)
       ConvoSim.Conversation.send_message(id, sample_msg)
@@ -231,7 +236,22 @@ defmodule ConvoSimWeb.DashboardLive do
               role="log"
               aria-live="polite"
             >
-              <%= if convo.messages == [] do %>
+              <%= if convo.status == :responding do %>
+                <div
+                  class="mr-auto bg-slate-800/90 border border-slate-700/50 text-slate-200 p-3 rounded-xl max-w-[85%]"
+                  aria-hidden="true"
+                >
+                  <div class="font-semibold text-[10px] uppercase tracking-wider mb-1 opacity-70">
+                    AI Assistant
+                  </div>
+                  <div class="flex gap-1 py-1">
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+                  </div>
+                </div>
+              <% end %>
+              <%= if convo.messages == [] and convo.status != :responding do %>
                 <div class="h-full flex items-center justify-center text-slate-600 italic">
                   No messages yet. Click "Send Message".
                 </div>
