@@ -236,7 +236,22 @@ defmodule ConvoSimWeb.DashboardLive do
               role="log"
               aria-live="polite"
             >
-              <%= if convo.messages == [] do %>
+              <%= if convo.status == :responding do %>
+                <div
+                  class="mr-auto bg-slate-800/90 border border-slate-700/50 text-slate-200 p-3 rounded-xl max-w-[85%]"
+                  aria-hidden="true"
+                >
+                  <div class="font-semibold text-[10px] uppercase tracking-wider mb-1 opacity-70">
+                    AI Assistant
+                  </div>
+                  <div class="flex gap-1 py-1">
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+                  </div>
+                </div>
+              <% end %>
+              <%= if convo.messages == [] and convo.status != :responding do %>
                 <div class="h-full flex items-center justify-center text-slate-600 italic">
                   No messages yet. Click "Send Message".
                 </div>
