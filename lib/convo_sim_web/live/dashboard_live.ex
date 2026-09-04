@@ -33,6 +33,7 @@ defmodule ConvoSimWeb.DashboardLive do
      |> assign(:page_title, "Conversation Simulator")
      |> assign(:last_spawn_time, 0)
      |> assign(:last_message_times, %{})
+     |> assign(:last_stop_times, %{})
      |> stream(:conversations, conversations)}
   end
 
@@ -112,17 +113,34 @@ defmodule ConvoSimWeb.DashboardLive do
 
   @impl true
   def handle_event("stop_conversation", %{"id" => id}, socket) do
-    case ConversationManager.stop_conversation(id) do
-      :ok ->
-        # Remove from local stream
-        {:noreply, stream_delete_by_id(socket, :conversations, id)}
+    now = System.system_time(:millisecond)
+    last_stop = Map.get(socket.assigns.last_stop_times, id, 0)
 
-      {:error, reason} ->
-        # 🛡️ Sentinel: Use inspect(id) to prevent log injection from unsanitized input
-        Logger.error("Failed to stop conversation #{inspect(id)}: #{inspect(reason)}")
+    if now - last_stop < 1000 do
+      Logger.warning("Rate limit exceeded for stop_conversation on conversation #{inspect(id)}")
 
-        {:noreply,
-         put_flash(socket, :error, "Failed to stop conversation. It may have already ended.")}
+      {:noreply,
+       put_flash(
+         socket,
+         :error,
+         "Please wait a moment before trying to stop this conversation again."
+       )}
+    else
+      new_last_stop_times = Map.put(socket.assigns.last_stop_times, id, now)
+      socket = assign(socket, :last_stop_times, new_last_stop_times)
+
+      case ConversationManager.stop_conversation(id) do
+        :ok ->
+          # Remove from local stream
+          {:noreply, stream_delete_by_id(socket, :conversations, id)}
+
+        {:error, reason} ->
+          # 🛡️ Sentinel: Use inspect(id) to prevent log injection from unsanitized input
+          Logger.error("Failed to stop conversation #{inspect(id)}: #{inspect(reason)}")
+
+          {:noreply,
+           put_flash(socket, :error, "Failed to stop conversation. It may have already ended.")}
+      end
     end
   end
 
