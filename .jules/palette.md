@@ -24,3 +24,7 @@
 ## 2024-11-20 - In-Context Visual Typing Indicator in UI
 **Learning:** When using Tailwind CSS `flex-col-reverse` for newest-first chat ordering natively, placing the typing indicator HTML element *before* the message loop ensures it renders visually at the bottom. Adding `aria-hidden="true"` to this typing bubble is critical to prevent screen readers from announcing it redundantly when a global `aria-live` region (like a status pill) is already broadcasting the "AI Responding..." state.
 **Action:** Always check the direction of flex containers (`flex-col-reverse` vs `flex-col`) before inserting temporary visual state elements like typing indicators. Additionally, audit `aria-live` regions on the page to prevent duplicate screen reader announcements by silencing visual-only indicators with `aria-hidden="true"`.
+
+## 2026-09-04 - Skip to main content links
+**Learning:** Implementing a "Skip to main content" link using utility classes like Tailwind's `sr-only focus:not-sr-only` is an effective, non-intrusive way to dramatically improve keyboard navigation and screen reader accessibility on Phoenix applications.
+**Action:** Add this by default on layout templates like `root.html.heex`, pointing to an explicit `id` on the `<main>` semantic tag.
