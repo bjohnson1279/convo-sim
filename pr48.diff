@@ -1,0 +1,37 @@
+diff --git a/.jules/palette.md b/.jules/palette.md
+index b5a1a1e..9cdf957 100644
+--- a/.jules/palette.md
++++ b/.jules/palette.md
+@@ -24,3 +24,7 @@
+ ## 2024-11-20 - In-Context Visual Typing Indicator in UI
+ **Learning:** When using Tailwind CSS `flex-col-reverse` for newest-first chat ordering natively, placing the typing indicator HTML element *before* the message loop ensures it renders visually at the bottom. Adding `aria-hidden="true"` to this typing bubble is critical to prevent screen readers from announcing it redundantly when a global `aria-live` region (like a status pill) is already broadcasting the "AI Responding..." state.
+ **Action:** Always check the direction of flex containers (`flex-col-reverse` vs `flex-col`) before inserting temporary visual state elements like typing indicators. Additionally, audit `aria-live` regions on the page to prevent duplicate screen reader announcements by silencing visual-only indicators with `aria-hidden="true"`.
++
++## 2026-09-04 - Skip to main content links
++**Learning:** Implementing a "Skip to main content" link using utility classes like Tailwind's `sr-only focus:not-sr-only` is an effective, non-intrusive way to dramatically improve keyboard navigation and screen reader accessibility on Phoenix applications.
++**Action:** Add this by default on layout templates like `root.html.heex`, pointing to an explicit `id` on the `<main>` semantic tag.
+diff --git a/lib/convo_sim_web/components/layouts.ex b/lib/convo_sim_web/components/layouts.ex
+index 379d46b..b020be6 100644
+--- a/lib/convo_sim_web/components/layouts.ex
++++ b/lib/convo_sim_web/components/layouts.ex
+@@ -66,7 +66,7 @@ defmodule ConvoSimWeb.Layouts do
+       </div>
+     </header>
+ 
+-    <main class="px-4 py-20 sm:px-6 lg:px-8">
++    <main id="main-content" class="px-4 py-20 sm:px-6 lg:px-8">
+       <div class="mx-auto max-w-2xl space-y-4">
+         {render_slot(@inner_block)}
+       </div>
+diff --git a/lib/convo_sim_web/components/layouts/root.html.heex b/lib/convo_sim_web/components/layouts/root.html.heex
+index e2a16ab..7394d4f 100644
+--- a/lib/convo_sim_web/components/layouts/root.html.heex
++++ b/lib/convo_sim_web/components/layouts/root.html.heex
+@@ -38,6 +38,7 @@
+     </script>
+   </head>
+   <body>
++    <a href="#main-content" class="sr-only focus:not-sr-only">Skip to main content</a>
+     {@inner_content}
+   </body>
+ </html>
