@@ -61,5 +61,8 @@ defmodule ConvoSim.ConversationTest do
 
     # Clean up so other tests don't fail
     for pid <- mock_pids, do: Process.exit(pid, :kill)
+
+    # Wait for cleanup
+    Process.sleep(100)
   end
 end
