@@ -131,6 +131,13 @@ defmodule ConvoSimWeb.DashboardLive do
 
       case ConversationManager.stop_conversation(id) do
         :ok ->
+          # ⚡ Bolt: Clean up dynamically populated rate-limit trackers to prevent
+          # memory leaks in long-running WebSocket connections.
+          socket =
+            socket
+            |> assign(:last_message_times, Map.delete(socket.assigns.last_message_times, id))
+            |> assign(:last_stop_times, Map.delete(socket.assigns.last_stop_times, id))
+
           # Remove from local stream
           {:noreply, stream_delete_by_id(socket, :conversations, id)}
 
@@ -172,12 +179,12 @@ defmodule ConvoSimWeb.DashboardLive do
               <.icon name="hero-chat-bubble-left-right" class="w-7 h-7 text-indigo-400" />
               Real-Time Conversation Simulator
             </h1>
-            
+
             <p class="text-sm text-slate-400 mt-1">
               Demonstrating OTP concurrency — each conversation is an isolated BEAM process.
             </p>
           </div>
-          
+
           <div>
             <button
               id="spawn-convo-btn"
@@ -189,7 +196,7 @@ defmodule ConvoSimWeb.DashboardLive do
             </button>
           </div>
         </div>
-         <%!-- Conversation Cards Grid --%>
+        <%!-- Conversation Cards Grid --%>
         <ul
           id="conversations"
           phx-update="stream"
@@ -202,11 +209,11 @@ defmodule ConvoSimWeb.DashboardLive do
           >
             <.icon name="hero-chat-bubble-oval-left" class="w-12 h-12 text-slate-600 mb-3" />
             <h3 class="text-base font-semibold text-slate-300">No Active Conversations</h3>
-            
+
             <p class="text-sm text-slate-500 mt-1 max-w-sm mb-4">
               Launch lightweight GenServer processes on the BEAM VM to get started.
             </p>
-            
+
             <button
               id="empty-state-spawn-btn"
               phx-click="spawn_conversation"
@@ -216,7 +223,7 @@ defmodule ConvoSimWeb.DashboardLive do
               <.icon name="hero-plus" class="w-4 h-4" /> Spawn Conversation
             </button>
           </li>
-          
+
           <li
             :for={{dom_id, convo} <- @streams.conversations}
             id={dom_id}
@@ -228,13 +235,13 @@ defmodule ConvoSimWeb.DashboardLive do
                 <span class="font-mono text-xs font-semibold px-2.5 py-1 bg-slate-800 text-indigo-300 rounded-lg border border-slate-700/50">
                   {convo.id}
                 </span>
-                
+
                 <span class="text-xs text-slate-500">
                   <%!-- ⚡ Bolt: Use O(1) cached message_count instead of O(N) length() --%> {convo.message_count}
                   <span aria-hidden="true">msgs</span><span class="sr-only">messages</span>
                 </span>
               </div>
-               <%!-- Status Pill --%>
+              <%!-- Status Pill --%>
               <div aria-live="polite" aria-atomic="true">
                 <%= if convo.status == :responding do %>
                   <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse">
@@ -247,7 +254,7 @@ defmodule ConvoSimWeb.DashboardLive do
                 <% end %>
               </div>
             </div>
-             <%!-- Messages Scroll Box --%>
+            <%!-- Messages Scroll Box --%>
             <%!-- ⚡ Bolt: Use flex-col-reverse to offload O(N) message ordering from BEAM to CSS natively --%>
             <div
               class="flex-1 my-4 flex flex-col-reverse gap-3 min-h-[160px] max-h-[240px] overflow-y-auto pr-1 text-xs scrollbar-thin"
@@ -262,7 +269,7 @@ defmodule ConvoSimWeb.DashboardLive do
                   <div class="font-semibold text-[10px] uppercase tracking-wider mb-1 opacity-70">
                     AI Assistant
                   </div>
-                  
+
                   <div class="flex gap-1 py-1">
                     <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
                     <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
@@ -270,7 +277,7 @@ defmodule ConvoSimWeb.DashboardLive do
                   </div>
                 </div>
               <% end %>
-              
+
               <%= if convo.messages == [] and convo.status != :responding do %>
                 <div class="h-full flex items-center justify-center text-slate-600 italic">
                   No messages yet. Click "Send Message".
@@ -287,13 +294,13 @@ defmodule ConvoSimWeb.DashboardLive do
                     <div class="font-semibold text-[10px] uppercase tracking-wider mb-1 opacity-70">
                       {if(msg.role == :customer, do: "Customer", else: "AI Assistant")}
                     </div>
-                    
+
                     <div>{msg.content}</div>
                   </div>
                 <% end %>
               <% end %>
             </div>
-             <%!-- Card Actions --%>
+            <%!-- Card Actions --%>
             <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
               <button
                 id={"send-btn-#{convo.id}"}
@@ -311,7 +318,7 @@ defmodule ConvoSimWeb.DashboardLive do
               >
                 <.icon name="hero-paper-airplane" class="w-3.5 h-3.5" /> Send Customer Message
               </button>
-              
+
               <button
                 id={"stop-btn-#{convo.id}"}
                 phx-click="stop_conversation"
