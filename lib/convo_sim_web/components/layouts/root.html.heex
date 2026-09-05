@@ -3,11 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title default="ConvoSim" suffix=" · Phoenix Framework" phx-no-format>{assigns[:page_title]}</.live_title>
+    <meta name="csrf-token" content={get_csrf_token()} /> <.live_title
+      default="ConvoSim"
+      suffix=" · Phoenix Framework"
+      phx-no-format
+    >{assigns[:page_title]}</.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
+    
     <script>
       (() => {
         const systemTheme = () => matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
@@ -37,17 +41,14 @@
       })();
     </script>
   </head>
+  
   <body>
     <a
       href="#main-content"
-<<<<<<< HEAD
-      class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-base-100 focus:text-base-content focus:border-b focus:border-r focus:border-base-300 rounded-br-lg"
-=======
       class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-indigo-600 focus:text-white focus:font-semibold focus:rounded-br-xl"
->>>>>>> origin/master
     >
       Skip to main content
     </a>
-    {@inner_content}
+     {@inner_content}
   </body>
 </html>
