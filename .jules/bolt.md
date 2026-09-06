@@ -41,3 +41,7 @@
 ## 2024-12-15 - O(1) single process state fetching via ETS Registry lookup
 **Learning:** By storing the process state directly in the Registry value via `Registry.update_value/3`, we can fetch the state of a process natively in O(1) time using `Registry.lookup/2`. This avoids synchronous messaging to the GenServer (`GenServer.call`), bypassing process message queues entirely, reducing latency, and preventing the fetch from being blocked by other messages being processed.
 **Action:** When a GenServer's state is frequently read by other processes (e.g. `get_state/1`), register and sync the state into the Registry value itself. Then, read it directly via `Registry.lookup/2` rather than sending a blocking `GenServer.call`.
+
+## 2025-01-20 - [Clean up dynamic state collections in LiveView]
+**Learning:** In Phoenix LiveView, accumulating state in Maps or Sets stored in socket assigns (such as for tracking timestamps for per-entity rate limiting) without removing the entries when the corresponding entities are deleted results in a memory leak. Because LiveView processes are long-running WebSockets, these dynamically populated maps will continue to grow and retain memory for the lifetime of the connection.
+**Action:** Always explicitly clean up dynamically populated state Maps or Sets in socket assigns (e.g., using `Map.delete/2`) when the corresponding entity or stream item is removed to prevent memory leaks.
