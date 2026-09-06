@@ -83,5 +83,9 @@ defmodule ConvoSimWeb.DashboardLiveTest do
     |> render_click()
 
     assert render(view) =~ "Maximum limit of 50 active conversations reached"
+
+    for i <- 1..needed do
+      Registry.unregister(ConvoSim.ConversationRegistry, "dash-limit-#{i}")
+    end
   end
 end
