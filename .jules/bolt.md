@@ -45,3 +45,15 @@
 ## 2025-01-20 - [Clean up dynamic state collections in LiveView]
 **Learning:** In Phoenix LiveView, accumulating state in Maps or Sets stored in socket assigns (such as for tracking timestamps for per-entity rate limiting) without removing the entries when the corresponding entities are deleted results in a memory leak. Because LiveView processes are long-running WebSockets, these dynamically populated maps will continue to grow and retain memory for the lifetime of the connection.
 **Action:** Always explicitly clean up dynamically populated state Maps or Sets in socket assigns (e.g., using `Map.delete/2`) when the corresponding entity or stream item is removed to prevent memory leaks.
+
+## Prevention Directives for Automated Refactoring
+- **Never Overwrite Complete Files**: Always use range-scoped replacement chunks (`StartLine`/`EndLine`) for edits to `schema.prisma`, `index.ts`, `public/index.php`, or DDL SQL scripts.
+- **Do Not Remove Core Declarations**: Do not delete existing route registrations or database DDL tables.
+- **Environment Isolation Compatibility**: When replacing fallback secrets, preserve test environment execution via `!getenv('APP_ENV')` or `getenv('APP_ENV') === 'testing'`.
+- **No Scratch Files**: Never stage or commit `test_*.ts`, `test_*.js`, `test.cjs`, `fix_*.php`, or `test.js` files to git.
+- **No Unresolved Conflict Markers**: Never stage or commit files containing Git merge conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`, `|||||||`). Always resolve conflicts cleanly before committing.
+
+## Hallucinatory Task & Empty PR Directives
+- **Zero-Diff Task Termination**: If the requested optimization, refactor, or fix is ALREADY natively present in the target branch, DO NOT create an empty pull request or commit an acknowledgment PR. Exit the task cleanly without opening a PR.
+- **Stale Suggestion Guard**: Always verify the current code on `main`/`master` before planning changes. If no actionable diff is required, cancel task execution immediately.
+
