@@ -32,6 +32,8 @@ defmodule ConvoSim.ConversationTest do
 
     assert ConversationManager.stop_conversation(id) == :ok
     assert_receive {:DOWN, ^ref, :process, ^pid, _reason}
+    # Wait for the Registry to asynchronously process the process death and remove the entry
+    Process.sleep(100)
     _ = :sys.get_state(ConvoSim.ConversationRegistry)
 
     refute id in ConversationManager.list_conversations()

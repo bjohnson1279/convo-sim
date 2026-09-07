@@ -24,3 +24,7 @@
 ## 2024-11-20 - In-Context Visual Typing Indicator in UI
 **Learning:** When using Tailwind CSS `flex-col-reverse` for newest-first chat ordering natively, placing the typing indicator HTML element *before* the message loop ensures it renders visually at the bottom. Adding `aria-hidden="true"` to this typing bubble is critical to prevent screen readers from announcing it redundantly when a global `aria-live` region (like a status pill) is already broadcasting the "AI Responding..." state.
 **Action:** Always check the direction of flex containers (`flex-col-reverse` vs `flex-col`) before inserting temporary visual state elements like typing indicators. Additionally, audit `aria-live` regions on the page to prevent duplicate screen reader announcements by silencing visual-only indicators with `aria-hidden="true"`.
+
+## 2024-11-20 - Continuous Animation Accessibility
+**Learning:** Continuous looping animations (like `animate-pulse` or `animate-bounce`) can cause nausea and discomfort for users with vestibular disorders.
+**Action:** Always prefix continuous looping animation classes with `motion-safe:` to respect the user's OS-level `prefers-reduced-motion` settings.
