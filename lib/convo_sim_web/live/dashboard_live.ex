@@ -73,9 +73,10 @@ defmodule ConvoSimWeb.DashboardLive do
   end
 
   @impl true
-  def handle_event("send_message", %{"id" => id}, socket) when byte_size(id) > 64 do
+  def handle_event("send_message", %{"id" => id}, socket)
+      when not is_binary(id) or byte_size(id) > 64 do
     # 🛡️ Sentinel: Validate input and reject massive identifiers entirely to prevent memory DoS
-    Logger.warning("Rejected send_message: ID exceeds maximum length")
+    Logger.warning("Rejected send_message: ID exceeds maximum length or is invalid type")
     {:noreply, socket}
   end
 
@@ -105,9 +106,10 @@ defmodule ConvoSimWeb.DashboardLive do
   end
 
   @impl true
-  def handle_event("stop_conversation", %{"id" => id}, socket) when byte_size(id) > 64 do
+  def handle_event("stop_conversation", %{"id" => id}, socket)
+      when not is_binary(id) or byte_size(id) > 64 do
     # 🛡️ Sentinel: Validate input and reject massive identifiers entirely to prevent memory DoS
-    Logger.warning("Rejected stop_conversation: ID exceeds maximum length")
+    Logger.warning("Rejected stop_conversation: ID exceeds maximum length or is invalid type")
     {:noreply, socket}
   end
 
