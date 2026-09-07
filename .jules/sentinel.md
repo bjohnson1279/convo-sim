@@ -58,3 +58,8 @@
 - **Zero-Diff Task Termination**: If the requested optimization, refactor, or fix is ALREADY natively present in the target branch, DO NOT create an empty pull request or commit an acknowledgment PR. Exit the task cleanly without opening a PR.
 - **Stale Suggestion Guard**: Always verify the current code on `main`/`master` before planning changes. If no actionable diff is required, cancel task execution immediately.
 
+
+## 2026-08-27 - Type Confusion Bypass of Length Validation Guards
+**Vulnerability:** Guard clauses enforcing length validation on LiveView event parameters (e.g., `when byte_size(id) > 64`) were bypassed when non-binary values (like maps or lists) were provided, exposing the system to memory exhaustion DoS.
+**Learning:** In Elixir, if a guard function (like `byte_size/1`) fails (e.g., when called on a map), it does not crash the process; instead, it silently evaluates to `false` for that guard and falls through to the next function clause. This can cause attackers to bypass strict length checks by sending complex, non-string JSON payloads to WebSocket event handlers, creating a type confusion vulnerability.
+**Prevention:** Always combine length validation guards with strict type checking (e.g., `when not is_binary(id) or byte_size(id) > 64`) to ensure unexpected types are securely rejected and do not bypass the safeguard.
