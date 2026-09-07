@@ -244,7 +244,7 @@ defmodule ConvoSimWeb.DashboardLive do
               <%!-- Status Pill --%>
               <div aria-live="polite" aria-atomic="true">
                 <%= if convo.status == :responding do %>
-                  <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 motion-safe:animate-pulse">
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> AI Responding...
                   </span>
                 <% else %>
@@ -271,9 +271,9 @@ defmodule ConvoSimWeb.DashboardLive do
                   </div>
 
                   <div class="flex gap-1 py-1">
-                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full motion-safe:animate-bounce [animation-delay:-0.3s]"></span>
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full motion-safe:animate-bounce [animation-delay:-0.15s]"></span>
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full motion-safe:animate-bounce"></span>
                   </div>
                 </div>
               <% end %>
