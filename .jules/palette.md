@@ -28,3 +28,6 @@
 ## 2024-11-20 - Continuous Animation Accessibility
 **Learning:** Continuous looping animations (like `animate-pulse` or `animate-bounce`) can cause nausea and discomfort for users with vestibular disorders.
 **Action:** Always prefix continuous looping animation classes with `motion-safe:` to respect the user's OS-level `prefers-reduced-motion` settings.
+## 2024-11-20 - Contextual Accessible Names in Repeated Lists
+**Learning:** Screen reader users can easily get lost when navigating through lists of identical components (like conversation cards) if buttons and IDs lack unique context (e.g., encountering multiple "Stop Process" or "Send Customer Message" buttons).
+**Action:** Always inject unique contextual information (like an ID or entity name) into interactive elements within repeated lists, either by updating `aria-label` or appending visually hidden text using `<span class="sr-only">`.
