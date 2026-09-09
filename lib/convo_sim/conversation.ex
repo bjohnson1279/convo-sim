@@ -43,7 +43,7 @@ defmodule ConvoSim.Conversation do
   @doc """
   Sends a message to the conversation.
   """
-  def send_message(id, content) when byte_size(content) <= 4000 do
+  def send_message(id, content) when is_binary(content) and byte_size(content) <= 4000 do
     # Using cast because we don't need to block waiting for the result.
     GenServer.cast(
       {:via, Registry, {ConvoSim.ConversationRegistry, id}},
@@ -52,6 +52,7 @@ defmodule ConvoSim.Conversation do
   end
 
   def send_message(_id, _content) do
+    # 🛡️ Sentinel: Reject excessively large or invalid payloads strictly
     {:error, :content_too_large}
   end
 
