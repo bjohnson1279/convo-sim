@@ -281,7 +281,7 @@ defmodule ConvoSimWeb.DashboardLive do
               <% end %>
 
               <%= if convo.messages == [] and convo.status != :responding do %>
-                <div class="h-full flex items-center justify-center text-slate-600 italic">
+                <div class="h-full flex items-center justify-center text-slate-400 italic">
                   No messages yet. Click "Send Message".
                 </div>
               <% else %>
@@ -318,7 +318,8 @@ defmodule ConvoSimWeb.DashboardLive do
                 }
                 class="flex-1 py-1.5 px-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-200 text-xs font-medium rounded-lg transition border border-slate-700/60 flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
               >
-                <.icon name="hero-paper-airplane" class="w-3.5 h-3.5" /> Send Customer Message<span class="sr-only"> to conversation {convo.id}</span>
+                <.icon name="hero-paper-airplane" class="w-3.5 h-3.5" />
+                Send Customer Message<span class="sr-only"> to conversation {convo.id}</span>
               </button>
 
               <button
