@@ -281,7 +281,7 @@ defmodule ConvoSimWeb.DashboardLive do
               <% end %>
 
               <%= if convo.messages == [] and convo.status != :responding do %>
-                <div class="h-full flex items-center justify-center text-slate-600 italic">
+                <div class="h-full flex items-center justify-center text-slate-400 italic">
                   No messages yet. Click "Send Message".
                 </div>
               <% else %>

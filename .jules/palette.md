@@ -31,3 +31,6 @@
 ## 2024-11-20 - Contextual Accessible Names in Repeated Lists
 **Learning:** Screen reader users can easily get lost when navigating through lists of identical components (like conversation cards) if buttons and IDs lack unique context (e.g., encountering multiple "Stop Process" or "Send Customer Message" buttons).
 **Action:** Always inject unique contextual information (like an ID or entity name) into interactive elements within repeated lists, either by updating `aria-label` or appending visually hidden text using `<span class="sr-only">`.
+## 2024-05-24 - Improve color contrast for empty state text
+**Learning:** In dark mode interfaces, using `text-slate-600` on `bg-slate-900` for small placeholder text fails WCAG AA contrast standards, making it hard to read.
+**Action:** Always use `text-slate-400` or lighter for small placeholder or descriptive text on dark backgrounds to ensure adequate accessibility color contrast.
