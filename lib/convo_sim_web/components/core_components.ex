@@ -111,7 +111,7 @@ defmodule ConvoSimWeb.CoreComponents do
 
     assigns =
       assign_new(assigns, :class, fn ->
-        ["btn", Map.fetch!(variants, assigns[:variant])]
+        ["btn", Map.fetch!(variants, assigns[:variant]), "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"]
       end)
 
     if rest[:href] || rest[:navigate] || rest[:patch] do

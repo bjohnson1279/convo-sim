@@ -1,36 +1,48 @@
 ## 2024-05-24 - Phoenix LiveView Destructive Actions
 **Learning:** Destructive actions in LiveView often lack native confirmation prompts and proper accessibility attributes for icon-only buttons.
 **Action:** Always use native `data-confirm` for destructive actions, `aria-label` for icon-only buttons, and `focus-visible` utilities to ensure keyboard accessibility in Phoenix LiveView templates.
+
 ## 2024-08-18 - Communicating Dynamic State
 **Learning:** Sighted users often struggle to understand why a button is disabled, while screen reader users need updates when dynamic content like status badges change independently of user action.
 **Action:** Always add descriptive `title` attributes explaining the disabled state dynamically, and wrap live-updating status indicators in `aria-live="polite"` regions.
+
 ## 2024-05-15 - [Theme Toggle Accessibility]
 **Learning:** Icon-only buttons like theme toggles are completely invisible to screen readers without ARIA labels, and without explicit focus-visible styles, keyboard users cannot navigate them predictably.
 **Action:** Always add `aria-label`, an optional `title` tooltip, and robust `focus-visible` states to any interaction element that only contains an icon.
+
 ## 2024-08-25 - Dynamic Chat Message Accessibility
 **Learning:** For chat message containers in Phoenix LiveView apps where messages are appended dynamically, screen readers often fail to announce incoming messages.
 **Action:** Use `role="log"` and `aria-live="polite"` on the container to ensure screen readers properly announce incoming messages as they are dynamically appended without a full page reload.
 
 ## 2024-11-20 - Chat Application Accessibility
 **Learning:** Chat messages appended dynamically are invisible to screen readers without specific ARIA attributes.
-**Action:** Always use \ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen readers announce incoming messages.
+**Action:** Always use \
+ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen readers announce incoming messages.
 
 ## 2026-08-26 - Decorative Icon Accessibility
 **Learning:** Decorative icons rendered as spans or SVGs without `aria-hidden="true"` can confuse screen readers by reading out obscure class names or creating extra stops.
 **Action:** Always add `aria-hidden="true"` to core icon components so screen readers ignore them and read the parent element's text or `aria-label` instead.
+
 ## 2024-06-25 - [Accessibility Improvements]
 **Learning:** For screen readers, raw abbreviations (like "msgs") and visually-styled collections without semantic list tags can hinder navigation and comprehension. Tailwind's `list-style: none` removes list semantics in Safari, so explicit `role="list"` and `<li>` elements are necessary to preserve accessibility.
 **Action:** Use `<ul role="list">` and `<li>` tags for collections instead of purely nested `<div>`s, and ensure visual abbreviations are accompanied by full screen-reader text using `aria-hidden="true"` and `<span class="sr-only">`.
+
 ## 2024-11-20 - In-Context Visual Typing Indicator in UI
 **Learning:** When using Tailwind CSS `flex-col-reverse` for newest-first chat ordering natively, placing the typing indicator HTML element *before* the message loop ensures it renders visually at the bottom. Adding `aria-hidden="true"` to this typing bubble is critical to prevent screen readers from announcing it redundantly when a global `aria-live` region (like a status pill) is already broadcasting the "AI Responding..." state.
 **Action:** Always check the direction of flex containers (`flex-col-reverse` vs `flex-col`) before inserting temporary visual state elements like typing indicators. Additionally, audit `aria-live` regions on the page to prevent duplicate screen reader announcements by silencing visual-only indicators with `aria-hidden="true"`.
 
+## 2024-11-20 - Global Button Focus Visibility
+**Learning:** General button components often lack explicit `focus-visible` styles in custom Tailwind configurations, meaning keyboard users do not receive clear visual feedback when tabbing through standard form buttons or links.
+**Action:** Always ensure the core button component (e.g., `lib/convo_sim_web/components/core_components.ex`'s `button/1`) includes `focus-visible` ring utilities (like `focus-visible:outline-none focus-visible:ring-2`) to guarantee keyboard accessibility across the entire application without relying on inconsistent browser defaults.
+
 ## 2024-11-20 - Continuous Animation Accessibility
 **Learning:** Continuous looping animations (like `animate-pulse` or `animate-bounce`) can cause nausea and discomfort for users with vestibular disorders.
 **Action:** Always prefix continuous looping animation classes with `motion-safe:` to respect the user's OS-level `prefers-reduced-motion` settings.
+
 ## 2024-11-20 - Contextual Accessible Names in Repeated Lists
 **Learning:** Screen reader users can easily get lost when navigating through lists of identical components (like conversation cards) if buttons and IDs lack unique context (e.g., encountering multiple "Stop Process" or "Send Customer Message" buttons).
 **Action:** Always inject unique contextual information (like an ID or entity name) into interactive elements within repeated lists, either by updating `aria-label` or appending visually hidden text using `<span class="sr-only">`.
+
 ## 2024-05-24 - Improve color contrast for empty state text
 **Learning:** In dark mode interfaces, using `text-slate-600` on `bg-slate-900` for small placeholder text fails WCAG AA contrast standards, making it hard to read.
 **Action:** Always use `text-slate-400` or lighter for small placeholder or descriptive text on dark backgrounds to ensure adequate accessibility color contrast.
