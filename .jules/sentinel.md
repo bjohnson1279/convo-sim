@@ -46,3 +46,25 @@
 **Vulnerability:** High severity HTTP/1 status-line buffering (CVE-2026-82728) and Medium severity chunk-size parsing issues (CVE-2026-82729) in `mint` v1.9.3.
 **Learning:** Outdated web server client dependencies can expose the application to denial-of-service (DoS) attacks.
 **Prevention:** Regularly audit dependencies using tools like `mix hex.audit` and apply security patches promptly.
+
+## Prevention Directives for Automated Refactoring
+- **Never Overwrite Complete Files**: Always use range-scoped replacement chunks (`StartLine`/`EndLine`) for edits to `schema.prisma`, `index.ts`, `public/index.php`, or DDL SQL scripts.
+- **Do Not Remove Core Declarations**: Do not delete existing route registrations or database DDL tables.
+- **Environment Isolation Compatibility**: When replacing fallback secrets, preserve test environment execution via `!getenv('APP_ENV')` or `getenv('APP_ENV') === 'testing'`.
+- **No Scratch Files**: Never stage or commit `test_*.ts`, `test_*.js`, `test.cjs`, `fix_*.php`, or `test.js` files to git.
+- **No Unresolved Conflict Markers**: Never stage or commit files containing Git merge conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`, `|||||||`). Always resolve conflicts cleanly before committing.
+
+## Hallucinatory Task & Empty PR Directives
+- **Zero-Diff Task Termination**: If the requested optimization, refactor, or fix is ALREADY natively present in the target branch, DO NOT create an empty pull request or commit an acknowledgment PR. Exit the task cleanly without opening a PR.
+- **Stale Suggestion Guard**: Always verify the current code on `main`/`master` before planning changes. If no actionable diff is required, cancel task execution immediately.
+
+
+## 2026-08-27 - Type Confusion Bypass of Length Validation Guards
+**Vulnerability:** Guard clauses enforcing length validation on LiveView event parameters (e.g., `when byte_size(id) > 64`) were bypassed when non-binary values (like maps or lists) were provided, exposing the system to memory exhaustion DoS.
+**Learning:** In Elixir, if a guard function (like `byte_size/1`) fails (e.g., when called on a map), it does not crash the process; instead, it silently evaluates to `false` for that guard and falls through to the next function clause. This can cause attackers to bypass strict length checks by sending complex, non-string JSON payloads to WebSocket event handlers, creating a type confusion vulnerability.
+**Prevention:** Always combine length validation guards with strict type checking (e.g., `when not is_binary(id) or byte_size(id) > 64`) to ensure unexpected types are securely rejected and do not bypass the safeguard.
+
+## 2026-09-10 - Prevent CSP unsafe-eval XSS Vector
+**Vulnerability:** The Content Security Policy (CSP) in `router.ex` included `'unsafe-eval'` in the `script-src` directive, which could allow arbitrary JavaScript execution via `eval()` or similar constructs.
+**Learning:** Phoenix LiveView applications do not require `'unsafe-eval'` for their client-side JavaScript to function correctly, so its inclusion unnecessarily expands the attack surface.
+**Prevention:** Always restrict CSP directives to the minimum required permissions. Omit `'unsafe-eval'` and rely on strict `'self'` or nonce/hash based execution for scripts in Phoenix apps.
