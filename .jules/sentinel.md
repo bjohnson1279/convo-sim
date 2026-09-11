@@ -63,3 +63,8 @@
 **Vulnerability:** Guard clauses enforcing length validation on LiveView event parameters (e.g., `when byte_size(id) > 64`) were bypassed when non-binary values (like maps or lists) were provided, exposing the system to memory exhaustion DoS.
 **Learning:** In Elixir, if a guard function (like `byte_size/1`) fails (e.g., when called on a map), it does not crash the process; instead, it silently evaluates to `false` for that guard and falls through to the next function clause. This can cause attackers to bypass strict length checks by sending complex, non-string JSON payloads to WebSocket event handlers, creating a type confusion vulnerability.
 **Prevention:** Always combine length validation guards with strict type checking (e.g., `when not is_binary(id) or byte_size(id) > 64`) to ensure unexpected types are securely rejected and do not bypass the safeguard.
+
+## 2026-09-10 - Prevent CSP unsafe-eval XSS Vector
+**Vulnerability:** The Content Security Policy (CSP) in `router.ex` included `'unsafe-eval'` in the `script-src` directive, which could allow arbitrary JavaScript execution via `eval()` or similar constructs.
+**Learning:** Phoenix LiveView applications do not require `'unsafe-eval'` for their client-side JavaScript to function correctly, so its inclusion unnecessarily expands the attack surface.
+**Prevention:** Always restrict CSP directives to the minimum required permissions. Omit `'unsafe-eval'` and rely on strict `'self'` or nonce/hash based execution for scripts in Phoenix apps.
