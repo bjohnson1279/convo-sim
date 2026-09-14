@@ -83,42 +83,52 @@ defmodule ConvoSim.Conversation do
     {:reply, state, state}
   end
 
+  require Logger
+
   @impl GenServer
   def handle_cast({:customer_message, content}, state) do
-    customer_msg = %{
-      role: :customer,
-      content: content,
-      timestamp: DateTime.utc_now()
-    }
+    if state.status == :responding do
+      Logger.warning(
+        "Rejected customer message: conversation #{inspect(state.id)} is already responding"
+      )
 
-    # Prepend instead of append (O(1) instead of O(N))
-    # ⚡ Bolt: We cache message_count to avoid O(N) length() calls in the UI
-    new_state = %{
-      state
-      | messages: [customer_msg | state.messages],
-        message_count: state.message_count + 1,
-        status: :responding
-    }
+      {:noreply, state}
+    else
+      customer_msg = %{
+        role: :customer,
+        content: content,
+        timestamp: DateTime.utc_now()
+      }
 
-    # Update state in Registry for O(1) fetching
-    Registry.update_value(ConvoSim.ConversationRegistry, new_state.id, fn _ -> new_state end)
+      # Prepend instead of append (O(1) instead of O(N))
+      # ⚡ Bolt: We cache message_count to avoid O(N) length() calls in the UI
+      new_state = %{
+        state
+        | messages: [customer_msg | state.messages],
+          message_count: state.message_count + 1,
+          status: :responding
+      }
 
-    # Broadcast status change
-    broadcast_all(new_state)
+      # Update state in Registry for O(1) fetching
+      Registry.update_value(ConvoSim.ConversationRegistry, new_state.id, fn _ -> new_state end)
 
-    # Spawn a Task for the AI response so we don't block the GenServer.
-    # The GenServer can still process other messages while waiting.
-    responder = Application.get_env(:convo_sim, :responder, ConvoSim.Responder.Simulated)
-    pid = self()
+      # Broadcast status change
+      broadcast_all(new_state)
 
-    Task.start(fn ->
-      # ⚡ Bolt: Pass newest-first history directly without Enum.reverse/1
-      response = responder.respond(content, state.messages)
-      # Send the result back to the GenServer using standard Erlang messaging
-      send(pid, {:ai_response, response})
-    end)
+      # Spawn a Task for the AI response so we don't block the GenServer.
+      # The GenServer can still process other messages while waiting.
+      responder = Application.get_env(:convo_sim, :responder, ConvoSim.Responder.Simulated)
+      pid = self()
 
-    {:noreply, new_state}
+      Task.start(fn ->
+        # ⚡ Bolt: Pass newest-first history directly without Enum.reverse/1
+        response = responder.respond(content, state.messages)
+        # Send the result back to the GenServer using standard Erlang messaging
+        send(pid, {:ai_response, response})
+      end)
+
+      {:noreply, new_state}
+    end
   end
 
   @impl GenServer
