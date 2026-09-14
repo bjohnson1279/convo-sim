@@ -85,3 +85,8 @@
 ## Hallucinatory Task & Empty PR Directives
 - **Zero-Diff Task Termination**: If the requested optimization, refactor, or fix is ALREADY natively present in the target branch, DO NOT create an empty pull request or commit an acknowledgment PR. Exit the task cleanly without opening a PR.
 - **Stale Suggestion Guard**: Always verify the current code on `main`/`master` before planning changes. If no actionable diff is required, cancel task execution immediately.
+
+## 2026-09-15 - Prevent GenServer DoS via State Validation
+**Vulnerability:** A GenServer did not validate its internal state before spawning background tasks in response to asynchronous casts (`handle_cast`). Because client-side limits (e.g., a disabled button) can be bypassed by firing WebSocket events directly, an attacker could spam events and exhaust system resources (threads/memory).
+**Learning:** Never rely exclusively on client-side state to prevent event spamming in stateful servers.
+**Prevention:** To prevent DoS via resource exhaustion in Elixir GenServers, explicitly check the process's current internal state (e.g., `if state.status == :responding`) before spawning new asynchronous tasks or executing heavy workloads in `handle_cast` or `handle_call`.
