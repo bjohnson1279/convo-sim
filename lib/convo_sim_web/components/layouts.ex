@@ -43,8 +43,8 @@ defmodule ConvoSimWeb.Layouts do
         </a>
       </div>
 
-      <div class="flex-none">
-        <ul class="flex flex-column px-1 space-x-4 items-center">
+      <nav class="flex-none" aria-label="Global">
+        <ul class="flex flex-column px-1 space-x-4 items-center" role="list">
           <li>
             <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
           </li>
@@ -63,7 +63,7 @@ defmodule ConvoSimWeb.Layouts do
             </a>
           </li>
         </ul>
-      </div>
+      </nav>
     </header>
 
     <main id="main-content" class="px-4 py-20 sm:px-6 lg:px-8">
