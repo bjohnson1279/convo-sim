@@ -431,7 +431,7 @@ defmodule ConvoSimWeb.CoreComponents do
 
   def list(assigns) do
     ~H"""
-    <ul class="list">
+    <ul class="list" role="list">
       <li :for={item <- @item} class="list-row">
         <div class="list-col-grow">
           <div class="font-bold">{item.title}</div>
