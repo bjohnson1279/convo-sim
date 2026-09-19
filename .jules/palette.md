@@ -46,3 +46,7 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## 2024-05-24 - Improve color contrast for empty state text
 **Learning:** In dark mode interfaces, using `text-slate-600` on `bg-slate-900` for small placeholder text fails WCAG AA contrast standards, making it hard to read.
 **Action:** Always use `text-slate-400` or lighter for small placeholder or descriptive text on dark backgrounds to ensure adequate accessibility color contrast.
+
+## 2024-09-12 - Empty State Icon Contrast
+**Learning:** In dark mode interfaces, using 	ext-slate-600 on g-slate-900 for empty state icons fails WCAG AA contrast standards, making it hard to read. It's important to use 	ext-slate-400 or lighter for empty state icons and text on dark backgrounds to ensure adequate accessibility color contrast.
+**Action:** Always use 	ext-slate-400 or lighter for empty state icons on dark backgrounds to ensure adequate accessibility color contrast.
