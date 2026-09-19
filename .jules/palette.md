@@ -50,3 +50,7 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## 2024-09-12 - Empty State Icon Contrast
 **Learning:** In dark mode interfaces, using 	ext-slate-600 on g-slate-900 for empty state icons fails WCAG AA contrast standards, making it hard to read. It's important to use 	ext-slate-400 or lighter for empty state icons and text on dark backgrounds to ensure adequate accessibility color contrast.
 **Action:** Always use 	ext-slate-400 or lighter for empty state icons on dark backgrounds to ensure adequate accessibility color contrast.
+
+## 2024-11-20 - External Link Accessibility
+**Learning:** External links in global navigation menus can be disruptive if they open in the same tab, especially for web apps where users might lose temporary state. Screen reader users need explicit context when a link opens a new tab, and all header links require clear focus states.
+**Action:** Always add `target="_blank"` and `rel="noopener noreferrer"` to external links. Append `<span class="sr-only"> (opens in a new tab)</span>` for screen readers, and ensure robust `focus-visible` utility classes are applied for keyboard accessibility.

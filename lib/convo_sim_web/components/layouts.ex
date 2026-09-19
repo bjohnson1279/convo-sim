@@ -37,7 +37,10 @@ defmodule ConvoSimWeb.Layouts do
     ~H"""
     <header class="navbar px-4 sm:px-6 lg:px-8">
       <div class="flex-1">
-        <a href="/" class="flex-1 flex w-fit items-center gap-2">
+        <a
+          href="/"
+          class="flex-1 flex w-fit items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-base-100 rounded-lg"
+        >
           <img src={~p"/images/logo.svg"} width="36" alt="ConvoSim Logo" />
           <span class="text-sm font-semibold">v{Application.spec(:phoenix, :vsn)}</span>
         </a>
@@ -46,11 +49,21 @@ defmodule ConvoSimWeb.Layouts do
       <nav class="flex-none" aria-label="Global">
         <ul class="flex flex-column px-1 space-x-4 items-center" role="list">
           <li>
-            <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
+            <a
+              href="https://phoenixframework.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-ghost focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-base-100 rounded-lg"
+            >Website<span class="sr-only"> (opens in a new tab)</span></a>
           </li>
 
           <li>
-            <a href="https://github.com/phoenixframework/phoenix" class="btn btn-ghost">GitHub</a>
+            <a
+              href="https://github.com/phoenixframework/phoenix"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-ghost focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-base-100 rounded-lg"
+            >GitHub<span class="sr-only"> (opens in a new tab)</span></a>
           </li>
 
           <li>
@@ -58,8 +71,14 @@ defmodule ConvoSimWeb.Layouts do
           </li>
 
           <li>
-            <a href="https://phoenix.hexdocs.pm/overview.html" class="btn btn-primary">
-              Get Started <span aria-hidden="true">&rarr;</span>
+            <a
+              href="https://phoenix.hexdocs.pm/overview.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-base-100 rounded-lg"
+            >
+              Get Started
+              <span aria-hidden="true">&rarr;</span><span class="sr-only"> (opens in a new tab)</span>
             </a>
           </li>
         </ul>
