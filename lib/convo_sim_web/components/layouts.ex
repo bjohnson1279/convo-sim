@@ -46,11 +46,21 @@ defmodule ConvoSimWeb.Layouts do
       <nav class="flex-none" aria-label="Global">
         <ul class="flex flex-column px-1 space-x-4 items-center" role="list">
           <li>
-            <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
+            <a
+              href="https://phoenixframework.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-ghost focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
+            >Website<span class="sr-only"> (opens in a new tab)</span></a>
           </li>
 
           <li>
-            <a href="https://github.com/phoenixframework/phoenix" class="btn btn-ghost">GitHub</a>
+            <a
+              href="https://github.com/phoenixframework/phoenix"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-ghost focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
+            >GitHub<span class="sr-only"> (opens in a new tab)</span></a>
           </li>
 
           <li>
@@ -58,8 +68,14 @@ defmodule ConvoSimWeb.Layouts do
           </li>
 
           <li>
-            <a href="https://phoenix.hexdocs.pm/overview.html" class="btn btn-primary">
-              Get Started <span aria-hidden="true">&rarr;</span>
+            <a
+              href="https://phoenix.hexdocs.pm/overview.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
+            >
+              Get Started
+              <span aria-hidden="true">&rarr;</span><span class="sr-only"> (opens in a new tab)</span>
             </a>
           </li>
         </ul>
