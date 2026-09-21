@@ -67,7 +67,8 @@ defmodule ConvoSim.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:req, "~> 0.5"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:mint, ">= 1.10.1"}
     ]
   end
 
