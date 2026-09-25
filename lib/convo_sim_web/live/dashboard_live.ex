@@ -259,9 +259,11 @@ defmodule ConvoSimWeb.DashboardLive do
             <%!-- Messages Scroll Box --%>
             <%!-- ⚡ Bolt: Use flex-col-reverse to offload O(N) message ordering from BEAM to CSS natively --%>
             <div
-              class="flex-1 my-4 flex flex-col-reverse gap-3 min-h-[160px] max-h-[240px] overflow-y-auto pr-1 text-xs scrollbar-thin"
+              class="flex-1 my-4 flex flex-col-reverse gap-3 min-h-[160px] max-h-[240px] overflow-y-auto pr-1 text-xs scrollbar-thin focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded-xl"
               role="log"
               aria-live="polite"
+              tabindex="0"
+              aria-label="Message history"
             >
               <%= if convo.status == :responding do %>
                 <div
