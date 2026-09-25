@@ -90,3 +90,7 @@
 **Vulnerability:** A GenServer did not validate its internal state before spawning background tasks in response to asynchronous casts (`handle_cast`). Because client-side limits (e.g., a disabled button) can be bypassed by firing WebSocket events directly, an attacker could spam events and exhaust system resources (threads/memory).
 **Learning:** Never rely exclusively on client-side state to prevent event spamming in stateful servers.
 **Prevention:** To prevent DoS via resource exhaustion in Elixir GenServers, explicitly check the process's current internal state (e.g., `if state.status == :responding`) before spawning new asynchronous tasks or executing heavy workloads in `handle_cast` or `handle_call`.
+## 2026-09-16 - Prevent Mutation XSS via Lazy_html Update
+**Vulnerability:** The `lazy_html` dependency was on version 0.1.12, which contains a known vulnerability (EEF-CVE-2026-92106 / GHSA-8rqp-v692-v82q) allowing mutation XSS when serializing SVG and MathML.
+**Learning:** Even seemingly inert HTML parsing/lazy loading libraries can introduce XSS vectors if they handle complex DOM structures (like SVG) improperly during serialization.
+**Prevention:** Regularly run `mix hex.audit` to identify and update vulnerable dependencies, and ensure libraries handling HTML output encode inputs correctly.
