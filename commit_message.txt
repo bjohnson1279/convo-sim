@@ -1,0 +1,10 @@
+Update lazy_html to 0.1.13 to fix CVE-2026-92106
+
+Bumps lazy_html from 0.1.12 to 0.1.13 to resolve a known mutation XSS
+vulnerability when serializing SVG and MathML script text.
+
+🚨 Severity: LOW
+💡 Vulnerability: The `lazy_html` dependency (v0.1.12) had a known mutation XSS vulnerability (EEF-CVE-2026-92106) due to improperly escaping SVG and MathML style and script text during serialization.
+🎯 Impact: Could allow an attacker to inject and execute arbitrary JavaScript if user-provided SVG/MathML is rendered.
+🔧 Fix: Updated `lazy_html` to version `0.1.13` via `mix deps.update lazy_html`, which resolves the escaping issue.
+✅ Verification: Ran `mix hex.audit` to verify no advisories remain, and `mix test` to ensure no regressions.
