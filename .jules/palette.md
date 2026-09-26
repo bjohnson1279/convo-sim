@@ -54,3 +54,6 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## 2024-11-20 - Global Navigation External Links
 **Learning:** External links in primary navigation menus often fail to warn screen reader users about context shifts (opening a new tab), which can be disorienting.
 **Action:** Always add `target="_blank"` and `rel="noopener noreferrer"` to external links. Additionally, append visually hidden text (e.g., `<span class="sr-only"> (opens in a new tab)</span>`) to give context to screen readers, and ensure robust `focus-visible` utility classes are applied to the anchor tags for keyboard navigation.
+## 2023-10-27 - Make message list keyboard scrollable
+**Learning:** Standalone scrollable containers (e.g., `overflow-y-auto`) need `tabindex="0"`, an appropriate `aria-label`, and `focus-visible` styles so keyboard-only users can scroll them using arrow keys without relying on inherently focusable child elements.
+**Action:** Always add `tabindex="0"`, `aria-label`, and `focus-visible` styling (like `focus-visible:outline-none focus-visible:ring-2`) to components with `overflow-auto` or `overflow-y-auto` that are meant to be scrolled directly by the user.
