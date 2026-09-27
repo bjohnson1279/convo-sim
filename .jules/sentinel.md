@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## 2024-08-15 - Hardcoded Internal IP in Configuration
 **Vulnerability:** Internal network IP (192.168.0.249) was hardcoded in LM Studio API configurations.
 **Learning:** Hardcoding internal infrastructure IPs can leak information about the network topology if the codebase is exposed or deployed.
@@ -95,3 +96,9 @@
 **Vulnerability:** A missing type check on the `id` argument in the `send_message/2` function could lead to type confusion where non-binary types implicitly bypass length validations like `byte_size(id) <= 64` when evaluated by Elixir's guards, posing a Denial of Service (DoS) risk through unexpected resource consumption down the pipeline.
 **Learning:** In Elixir, if a guard function (like `byte_size/1`) fails (e.g., when called on an invalid type like a list), it does not crash the process; instead, it silently evaluates to `false` and falls through to the next function clause. Missing an explicit `is_binary/1` guard when using `byte_size/1` enables attackers to craft type confusion payloads that bypass strict length checks.
 **Prevention:** Always combine length validation guards with strict type checking (e.g., `when is_binary(id) and byte_size(id) <= 64`) to ensure inputs are exactly what they're expected to be and malicious bypasses via type confusion are securely rejected.
+
+## 2026-09-27 - Update lazy_html to fix XSS vulnerability
+**Vulnerability:** `lazy_html` < 0.1.13 is vulnerable to mutation XSS due to unescaped serialization of SVG and MathML style/script text (EEF-CVE-2026-92106).
+**Learning:** Dependency vulnerabilities can be introduced in mix.lock and checking via mix hex.audit is important.
+**Prevention:** Keep dependencies updated via mix deps.update and regularly audit packages.
+
