@@ -58,3 +58,8 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## 2024-09-24 - Flash Message Dismissal UX
 **Learning:** Attaching click-to-dismiss handlers to the entire container of a flash/toast message creates a frustrating experience when users attempt to highlight and copy error text, as the message disappears on mouse-up/click.
 **Action:** Always attach dismissal actions (`phx-click`) specifically to the close `<button>` element rather than the parent container to allow text selection.
+
+## 2024-11-20 - Keyboard Accessibility for Scrollable Containers
+**Learning:** Standalone scrollable containers (e.g., `overflow-auto`) that do not contain inherently focusable elements are inaccessible to keyboard-only users, as they cannot receive focus to be scrolled via arrow keys.
+**Action:** Always include `tabindex="0"`, an appropriate `aria-label`, and robust `focus-visible` styles on scrollable containers so keyboard-only users can navigate and scroll them predictably.
+
