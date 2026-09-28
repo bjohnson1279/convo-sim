@@ -61,7 +61,6 @@ defmodule ConvoSimWeb.CoreComponents do
     <div
       :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
       id={@id}
-      phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
       class="toast toast-top toast-end z-50"
       {@rest}
@@ -81,6 +80,7 @@ defmodule ConvoSimWeb.CoreComponents do
         <div class="flex-1" />
         <button
           type="button"
+          phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
           class="group self-start cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
           aria-label={gettext("close")}
           title={gettext("close")}
