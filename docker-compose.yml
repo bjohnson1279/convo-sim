@@ -2,7 +2,7 @@ services:
   app:
     build: .
     ports:
-      - "4000:4000"
+      - "${PORT:-4000}:4000"
     volumes:
       # Mount workspace so source edits on host are immediately visible in container
       - .:/app
