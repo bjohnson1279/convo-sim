@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## 2024-08-15 - Hardcoded Internal IP in Configuration
 **Vulnerability:** Internal network IP (192.168.0.249) was hardcoded in LM Studio API configurations.
 **Learning:** Hardcoding internal infrastructure IPs can leak information about the network topology if the codebase is exposed or deployed.
