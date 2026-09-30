@@ -101,3 +101,11 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## 2026-09-29 - Scope Verification for Async Loading Attributes
 **Learning:** Blindly injecting `disabled={loading}` or `aria-busy={loading}` into JSX/TSX buttons causes fatal TypeScript compilation errors (`TS2304: Cannot find name 'loading'`) when `loading` is not declared in component props, state hooks (`useState`), or mutation results. Furthermore, using temporary patch scripts (`fix_*.cjs`) to manipulate source code pollutes the git index.
 **Action:** Before referencing any state identifier (such as `loading`, `isSubmitting`, `isPending`) in `disabled` or `aria-busy`, inspect the component scope. If no loading state is tracked, define it using `useState(false)` or check existing query/mutation hooks. Never bind undeclared variables. Always run `tsc --noEmit` locally and never commit temporary fix scripts.
+
+## 2024-11-20 - Semantic HTML Heading Hierarchy
+**Learning:** Empty states and standalone components frequently violate semantic heading hierarchy by jumping levels (e.g., from `<h1>` to `<h3>`), which can confuse screen reader navigation.
+**Action:** Always verify that headings cascade correctly (`<h1>` -> `<h2>` -> `<h3>`) across the entire page, including conditional empty states.
+
+## 2024-11-20 - Global Navigation Focus Styles
+**Learning:** Logo and home anchor tags in global navigation headers are often neglected when applying global focus styles, breaking keyboard-only navigation.
+**Action:** Ensure all interactive elements, including layout-level links such as the Home/Logo anchor tags, explicitly implement visible focus styles (e.g., using Tailwind's `focus-visible:ring-2`) to support full keyboard-only navigability.
