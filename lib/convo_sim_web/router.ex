@@ -11,8 +11,10 @@ defmodule ConvoSimWeb.Router do
     plug :put_secure_browser_headers, %{
       "content-security-policy" =>
         "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' ws: wss:;",
-      # 🛡️ Sentinel: Add Permissions-Policy header to restrict access to sensitive browser features
-      "permissions-policy" => "camera=(), microphone=(), geolocation=()"
+      "permissions-policy" => "camera=(), microphone=(), geolocation=()",
+      # 🛡️ Sentinel: Enhance cross-origin protections
+      "cross-origin-opener-policy" => "same-origin",
+      "cross-origin-resource-policy" => "same-origin"
     }
   end
 
