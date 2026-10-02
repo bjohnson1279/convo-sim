@@ -73,16 +73,22 @@ defmodule ConvoSim.Responder.LMStudio do
 
   # Converts our internal message format to OpenAI's chat format
   defp build_messages(history, current_message) do
-    # ⚡ Bolt: Use Enum.reduce to build the chronological list in O(N) single pass
-    # from the newest-first history list without using O(N) ++ concatenation.
+    # ⚡ Bolt: Recursively build the chronological list in O(N) single pass natively
+    # avoiding anonymous function closure allocations in Enum.reduce.
     acc = [%{role: "user", content: current_message}]
 
-    past_and_current =
-      Enum.reduce(history, acc, fn msg, acc_list ->
-        role = if msg.role == :customer, do: "user", else: "assistant"
-        [%{role: role, content: msg.content} | acc_list]
-      end)
+    past_and_current = do_build_messages(history, acc)
 
     [%{role: "system", content: @system_prompt} | past_and_current]
+  end
+
+  defp do_build_messages([], acc), do: acc
+
+  defp do_build_messages([%{role: :customer, content: content} | rest], acc) do
+    do_build_messages(rest, [%{role: "user", content: content} | acc])
+  end
+
+  defp do_build_messages([%{role: _, content: content} | rest], acc) do
+    do_build_messages(rest, [%{role: "assistant", content: content} | acc])
   end
 end
