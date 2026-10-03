@@ -101,3 +101,7 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## 2026-09-29 - Scope Verification for Async Loading Attributes
 **Learning:** Blindly injecting `disabled={loading}` or `aria-busy={loading}` into JSX/TSX buttons causes fatal TypeScript compilation errors (`TS2304: Cannot find name 'loading'`) when `loading` is not declared in component props, state hooks (`useState`), or mutation results. Furthermore, using temporary patch scripts (`fix_*.cjs`) to manipulate source code pollutes the git index.
 **Action:** Before referencing any state identifier (such as `loading`, `isSubmitting`, `isPending`) in `disabled` or `aria-busy`, inspect the component scope. If no loading state is tracked, define it using `useState(false)` or check existing query/mutation hooks. Never bind undeclared variables. Always run `tsc --noEmit` locally and never commit temporary fix scripts.
+
+## 2024-10-03 - Fix Empty State Heading Hierarchy
+**Learning:** Empty states and standalone components often have their heading levels hardcoded visually (e.g., `<h3>` for size), resulting in broken semantic HTML hierarchies (e.g., skipping from `<h1>` to `<h3>`). This breaks screen reader navigation.
+**Action:** Always verify that heading hierarchy strictly cascades sequentially (`<h1>` -> `<h2>` -> `<h3>`) within the full page context, regardless of visual styling preferences.

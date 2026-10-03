@@ -210,7 +210,7 @@ defmodule ConvoSimWeb.DashboardLive do
             class="hidden only:flex col-span-full flex-col items-center justify-center p-12 text-center bg-slate-900/50 border border-dashed border-slate-800 rounded-2xl"
           >
             <.icon name="hero-chat-bubble-oval-left" class="w-12 h-12 text-slate-400 mb-3" />
-            <h3 class="text-base font-semibold text-slate-300">No Active Conversations</h3>
+            <h2 class="text-base font-semibold text-slate-300">No Active Conversations</h2>
 
             <p class="text-sm text-slate-400 mt-1 max-w-sm mb-4">
               Launch lightweight GenServer processes on the BEAM VM to get started.
