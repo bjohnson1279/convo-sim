@@ -21,6 +21,9 @@ config :convo_sim, ConvoSimWeb.Endpoint,
   pubsub_server: ConvoSim.PubSub,
   live_view: [signing_salt: "kNPzqRSx"]
 
+# Set default signing salt, overridden in runtime.exs
+config :convo_sim, session_signing_salt: "5/hl7WD3"
+
 # Configure LiveView
 config :phoenix_live_view,
   # the attribute set on all root tags. Used for Phoenix.LiveView.ColocatedCSS.

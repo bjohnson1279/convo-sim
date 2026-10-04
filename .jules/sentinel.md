@@ -121,3 +121,7 @@
 ## 2026-09-29 - Non-Destructive Security Patching & CI Protection
 **Learning:** Security patches must never weaken CI workflow files (`.github/workflows/**`) by appending `|| true` or `continue-on-error: true` to suppress test/build failures. Furthermore, when adding defensive type assertions or input validators in TypeScript, omitting explicit types can introduce `TS7006: Parameter implicitly has an 'any' type`.
 **Action:** Never modify CI workflow definitions to bypass test failures; resolve the underlying issue in source code or test fixtures. Always provide explicit types on newly introduced parameters and helper functions. Ensure zero scratch scripts (`fix_*.php`, `test_*.js`) are committed.
+
+## 2026-10-04 - Safely Supply Module Attributes at Runtime
+**Learning:** In Elixir, module attributes (e.g., `@session_options`) are evaluated strictly at compile time. Using `System.get_env/1` inside a module attribute bakes the environment variable's value during the build process, preventing dynamic runtime configuration.
+**Prevention:** To supply secrets at runtime for plugs that accept options defined in module attributes, use standard mechanisms like tuples (`{Application, :fetch_env!, [:app, :key]}`) if the plug supports it, and configure the actual environment variables inside `runtime.exs`.
