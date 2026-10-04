@@ -7,7 +7,8 @@ defmodule ConvoSimWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_convo_sim_key",
-    signing_salt: "5/hl7WD3",
+    # 🛡️ Sentinel: Fetched via runtime configuration instead of compile-time
+    signing_salt: {Application, :fetch_env!, [:convo_sim, :session_signing_salt]},
     same_site: "Lax"
   ]
 
