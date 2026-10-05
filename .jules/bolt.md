@@ -98,3 +98,6 @@
 ## 2025-02-12 - Native Recursion vs Enum.reduce for Critical Path Data Transformation
 **Learning:** In Elixir, using `Enum.reduce` creates anonymous function closures which allocate memory and involve dynamic dispatch overhead. For critical hot paths (like formatting long chat histories on every request), replacing `Enum.reduce` with explicit recursive function heads provides a ~35% performance speedup by enabling the BEAM compiler to perform direct native pattern matching and eliminate the closure overhead.
 **Action:** For simple, high-frequency list transformations, write explicit recursive private function heads (`defp loop([...], acc)`) instead of using `Enum.reduce` with inline anonymous functions.
+## 2026-10-05 - Optimize random message selection
+**Learning:** `Enum.random/1` on a list is an O(N) operation because it calculates the list's length.
+**Action:** Convert compile-time lists used for random selection to tuples and use `elem/2` with `:rand.uniform` for O(1) random access.

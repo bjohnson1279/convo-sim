@@ -7,13 +7,14 @@ defmodule ConvoSimWeb.DashboardLive do
 
   # ⚡ Bolt: Extract static default_messages to a module attribute evaluated at compile-time.
   # This prevents memory allocation and garbage collection of this list on every `send_message` event.
-  @default_messages [
+  # ⚡ Bolt: Storing as a Tuple instead of a List allows O(1) random element access natively.
+  @default_messages {
     "Hello, I need help with my account billing.",
     "Can I change my subscription plan?",
     "My order hasn't arrived yet, where is it?",
     "Is there a discount available for annual plans?",
     "I am having trouble logging into my account."
-  ]
+  }
 
   @impl true
   def mount(_params, _session, socket) do
@@ -98,7 +99,8 @@ defmodule ConvoSimWeb.DashboardLive do
       new_last_message_times = Map.put(socket.assigns.last_message_times, id, now)
       socket = assign(socket, :last_message_times, new_last_message_times)
 
-      sample_msg = Enum.random(@default_messages)
+      # ⚡ Bolt: Replace O(N) list traversal with O(1) tuple indexing for random element selection
+      sample_msg = elem(@default_messages, :rand.uniform(tuple_size(@default_messages)) - 1)
       ConvoSim.Conversation.send_message(id, sample_msg)
 
       {:noreply, socket}
