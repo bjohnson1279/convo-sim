@@ -67,7 +67,9 @@ defmodule ConvoSimWeb.DashboardLive do
         {:error, reason} ->
           # 🛡️ Sentinel: Log internal error to avoid information leakage in UI
           Logger.error("Failed to start conversation: #{inspect(reason)}")
-          {:noreply, put_flash(socket, :error, "Failed to start conversation. Please try again.")}
+
+          {:noreply,
+           put_flash(socket, :error, "Failed to start conversation. Please wait and try again.")}
       end
     end
   end
@@ -147,8 +149,7 @@ defmodule ConvoSimWeb.DashboardLive do
           # 🛡️ Sentinel: Use inspect(id) to prevent log injection from unsanitized input
           Logger.error("Failed to stop conversation #{inspect(id)}: #{inspect(reason)}")
 
-          {:noreply,
-           put_flash(socket, :error, "Failed to stop conversation. It may have already ended.")}
+          {:noreply, put_flash(socket, :error, "Failed to stop conversation. Please try again.")}
       end
     end
   end

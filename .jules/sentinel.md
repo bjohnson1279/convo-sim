@@ -125,3 +125,8 @@
 ## 2026-10-04 - Safely Supply Module Attributes at Runtime
 **Learning:** In Elixir, module attributes (e.g., `@session_options`) are evaluated strictly at compile time. Using `System.get_env/1` inside a module attribute bakes the environment variable's value during the build process, preventing dynamic runtime configuration.
 **Prevention:** To supply secrets at runtime for plugs that accept options defined in module attributes, use standard mechanisms like tuples (`{Application, :fetch_env!, [:app, :key]}`) if the plug supports it, and configure the actual environment variables inside `runtime.exs`.
+
+## 2026-10-07 - Prevent Information Leakage in LiveView Error Messages
+**Vulnerability:** LiveView event handlers (`lib/convo_sim_web/live/dashboard_live.ex`) were exposing internal OTP error reasons directly to the user via flash messages (e.g. `put_flash(socket, :error, "Failed to start: #{inspect(reason)}")`).
+**Learning:** Using `inspect(reason)` in UI messages leaks internal BEAM state and architecture details (like GenServer crash reasons).
+**Prevention:** Always log the verbose error details internally (e.g. `Logger.error`) and return a safe, generic error message to the user.
