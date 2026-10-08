@@ -8,8 +8,8 @@ defmodule ConvoSimWeb.DashboardLiveTest do
 
     assert html =~ "Real-Time Conversation Simulator"
     assert has_element?(view, ~s|img[alt="ConvoSim Logo"]|)
-    assert has_element?(view, ~s|button#spawn-convo-btn[phx-disable-with="Spawning..."]|)
-    assert has_element?(view, ~s|button#empty-state-spawn-btn[phx-disable-with="Spawning..."]|)
+    assert has_element?(view, ~s|button#spawn-convo-btn|)
+    assert has_element?(view, ~s|button#empty-state-spawn-btn|)
     assert has_element?(view, "#conversations")
   end
 
@@ -48,9 +48,7 @@ defmodule ConvoSimWeb.DashboardLiveTest do
            )
 
     assert has_element?(view, ~s|button#stop-btn-#{id}[aria-label="Stop conversation #{id}"]|)
-    assert has_element?(view, ~s|button#stop-btn-#{id}[phx-disable-with="Stopping..."]|)
     assert has_element?(view, ~s|button#send-btn-#{id}[title="Send Customer Message"]|)
-    assert has_element?(view, ~s|button#send-btn-#{id}[phx-disable-with="Sending..."]|)
 
     ConvoSim.ConversationManager.stop_conversation(id)
   end

@@ -105,3 +105,7 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## 2024-10-03 - Fix Empty State Heading Hierarchy
 **Learning:** Empty states and standalone components often have their heading levels hardcoded visually (e.g., `<h3>` for size), resulting in broken semantic HTML hierarchies (e.g., skipping from `<h1>` to `<h3>`). This breaks screen reader navigation.
 **Action:** Always verify that heading hierarchy strictly cascades sequentially (`<h1>` -> `<h2>` -> `<h3>`) within the full page context, regardless of visual styling preferences.
+
+## 2024-11-20 - Prevent Layout Shift on Button Loading State
+**Learning:** Using `phx-disable-with` in Phoenix LiveView to replace button content during loading causes a frustrating visual layout shift, especially when replacing an icon-only or icon-and-text button with raw text (like "Spawning...").
+**Action:** Instead of `phx-disable-with`, use Tailwind's `phx-click-loading` variant (e.g. `phx-click-loading:opacity-50 phx-click-loading:cursor-not-allowed`) to disable the button natively, and use it to swap visibility between the default icon and a loading spinner (e.g., `phx-click-loading:hidden` on the icon, and `hidden phx-click-loading:block animate-spin` on the spinner).
