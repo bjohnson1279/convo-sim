@@ -109,3 +109,6 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## 2024-11-20 - Prevent Layout Shift on Button Loading State
 **Learning:** Using `phx-disable-with` in Phoenix LiveView to replace button content during loading causes a frustrating visual layout shift, especially when replacing an icon-only or icon-and-text button with raw text (like "Spawning...").
 **Action:** Instead of `phx-disable-with`, use Tailwind's `phx-click-loading` variant (e.g. `phx-click-loading:opacity-50 phx-click-loading:cursor-not-allowed`) to disable the button natively, and use it to swap visibility between the default icon and a loading spinner (e.g., `phx-click-loading:hidden` on the icon, and `hidden phx-click-loading:block animate-spin` on the spinner).
+## 2024-11-20 - Prevent Layout Shift on Button Loading State (Addendum)
+**Learning:** For continuous looping animation classes (like Tailwind's `animate-pulse`, `animate-bounce`, or `animate-spin`), blindly applying them without `motion-safe:` creates a frustrating and potentially harmful experience for users with vestibular disorders.
+**Action:** Always prefix continuous looping animation classes with `motion-safe:` to respect the user's OS-level `prefers-reduced-motion` settings.
