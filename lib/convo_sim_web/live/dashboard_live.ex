@@ -196,7 +196,7 @@ defmodule ConvoSimWeb.DashboardLive do
               <.icon name="hero-plus" class="w-4 h-4 phx-click-loading:hidden" />
               <.icon
                 name="hero-arrow-path"
-                class="w-4 h-4 hidden phx-click-loading:block animate-spin"
+                class="w-4 h-4 hidden phx-click-loading:block motion-safe:animate-spin"
               /> Spawn Conversation
             </button>
           </div>
@@ -227,7 +227,7 @@ defmodule ConvoSimWeb.DashboardLive do
               <.icon name="hero-plus" class="w-4 h-4 phx-click-loading:hidden" />
               <.icon
                 name="hero-arrow-path"
-                class="w-4 h-4 hidden phx-click-loading:block animate-spin"
+                class="w-4 h-4 hidden phx-click-loading:block motion-safe:animate-spin"
               /> Spawn Conversation
             </button>
           </li>
@@ -328,7 +328,7 @@ defmodule ConvoSimWeb.DashboardLive do
                 <.icon name="hero-paper-airplane" class="w-3.5 h-3.5 phx-click-loading:hidden" />
                 <.icon
                   name="hero-arrow-path"
-                  class="w-3.5 h-3.5 hidden phx-click-loading:block animate-spin"
+                  class="w-3.5 h-3.5 hidden phx-click-loading:block motion-safe:animate-spin"
                 /> Send Customer Message<span class="sr-only"> to conversation {convo.id}</span>
               </button>
 
@@ -344,7 +344,7 @@ defmodule ConvoSimWeb.DashboardLive do
                 <.icon name="hero-trash" class="w-3.5 h-3.5 phx-click-loading:hidden" />
                 <.icon
                   name="hero-arrow-path"
-                  class="w-3.5 h-3.5 hidden phx-click-loading:block animate-spin"
+                  class="w-3.5 h-3.5 hidden phx-click-loading:block motion-safe:animate-spin"
                 />
               </button>
             </div>
