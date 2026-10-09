@@ -63,6 +63,21 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 **Learning:** Standalone scrollable containers (e.g., `overflow-auto`) that do not contain inherently focusable elements are inaccessible to keyboard-only users, as they cannot receive focus to be scrolled via arrow keys.
 **Action:** Always include `tabindex="0"`, an appropriate `aria-label`, and robust `focus-visible` styles on scrollable containers so keyboard-only users can navigate and scroll them predictably.
 
+## 2026-09-29 - Scope Verification for Async Loading Attributes
+**Learning:** Blindly injecting `disabled={loading}` or `aria-busy={loading}` into JSX/TSX buttons causes fatal TypeScript compilation errors (`TS2304: Cannot find name 'loading'`) when `loading` is not declared in component props, state hooks (`useState`), or mutation results. Furthermore, using temporary patch scripts (`fix_*.cjs`) to manipulate source code pollutes the git index.
+**Action:** Before referencing any state identifier (such as `loading`, `isSubmitting`, `isPending`) in `disabled` or `aria-busy`, inspect the component scope. If no loading state is tracked, define it using `useState(false)` or check existing query/mutation hooks. Never bind undeclared variables. Always run `tsc --noEmit` locally and never commit temporary fix scripts.
+
+## 2024-10-03 - Fix Empty State Heading Hierarchy
+**Learning:** Empty states and standalone components often have their heading levels hardcoded visually (e.g., `<h3>` for size), resulting in broken semantic HTML hierarchies (e.g., skipping from `<h1>` to `<h3>`). This breaks screen reader navigation.
+**Action:** Always verify that heading hierarchy strictly cascades sequentially (`<h1>` -> `<h2>` -> `<h3>`) within the full page context, regardless of visual styling preferences.
+
+## 2024-11-20 - Prevent Layout Shift on Button Loading State
+**Learning:** Using `phx-disable-with` in Phoenix LiveView to replace button content during loading causes a frustrating visual layout shift, especially when replacing an icon-only or icon-and-text button with raw text (like "Spawning...").
+**Action:** Instead of `phx-disable-with`, use Tailwind's `phx-click-loading` variant (e.g. `phx-click-loading:opacity-50 phx-click-loading:cursor-not-allowed`) to disable the button natively, and use it to swap visibility between the default icon and a loading spinner (e.g., `phx-click-loading:hidden` on the icon, and `hidden phx-click-loading:block animate-spin` on the spinner).
+
+## 2024-11-20 - Prevent Layout Shift on Button Loading State (Addendum)
+**Learning:** For continuous looping animation classes (like Tailwind's `animate-pulse`, `animate-bounce`, or `animate-spin`), blindly applying them without `motion-safe:` creates a frustrating and potentially harmful experience for users with vestibular disorders.
+**Action:** Always prefix continuous looping animation classes with `motion-safe:` to respect the user's OS-level `prefers-reduced-motion` settings.
 
 ## Prevention Directives for Automated Refactoring
 - **Never Overwrite Complete Files**: Always use range-scoped replacement chunks for edits to `schema.prisma`, `index.ts`, `public/index.php`, `db/schema.rb`, or DDL SQL scripts.
@@ -85,10 +100,10 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## Assertiveness, Decisive PR Execution & Comparative Recommendations
 - **Proactive & Decisive PR Submission**: Do NOT repeatedly pause to ask permission to open a pull request (e.g., avoid "Would you like me to open a PR for this?", "Can I submit the PR?", "Should I go ahead and create the PR?"). When an optimization, fix, or feature satisfies requirements, passes local test runners/linters, and preserves architectural invariants, proceed decisively to create and submit the Pull Request with a clear, structured summary and rationale.
 - **Explicit Recommendations on Options**: When presenting multiple implementation strategies or architecture options (e.g., Option A vs. Option B), NEVER leave the choice open-ended or passive. Always make an explicit, reasoned recommendation (prefixed with `(Recommended)`) based on **overall technical effectiveness**:
-  1. *Algorithmic & Complexity Gains*: Time and space complexity impact (O(N*M) -> O(N+M), reduction of nested scans).
-  2. *Resource Overhead*: Heap allocations, memory pressure, and GC pause reduction.
-  3. *Domain & Architecture Invariants*: Strict backward compatibility, contract stability, and prevention of regression risks.
-  4. *Security & Reliability*: Input validation, cryptographic safety, and concurrency safety.
+1. *Algorithmic & Complexity Gains*: Time and space complexity impact (O(N*M) -> O(N+M), reduction of nested scans).
+2. *Resource Overhead*: Heap allocations, memory pressure, and GC pause reduction.
+3. *Domain & Architecture Invariants*: Strict backward compatibility, contract stability, and prevention of regression risks.
+4. *Security & Reliability*: Input validation, cryptographic safety, and concurrency safety.
 - **Lead with Recommended Path**: State clearly why the recommended solution delivers the highest net value and immediately execute or propose it as the primary course of action rather than asking open-ended questions.
 
 ## Scope Verification, Minimal Churn & CI Protection Directives
@@ -97,10 +112,6 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 - **Zero Scratch File Commits**: Never stage or commit ad-hoc verification, patch, or debug scripts (`test.cjs`, `fix_*.cjs`, `fix_*.php`, `patch_*.py`, `patch_*.sh`, `scratch_*`). Execute checks via the project's native test commands (`npm test`, `pytest`, `phpunit`, etc.) and delete temporary scripts before creating git commits.
 - **Never Weaken CI Workflows**: Do not modify `.github/workflows/**` to bypass failures (e.g. adding `|| true`, setting `continue-on-error: true`, or commenting out assertions). Always resolve the defect in the source code or test fixture.
 - **Explicit Parameter & Variable Types**: In TypeScript files, avoid implicit `any` by always providing explicit types on functions, parameters, and arrow callbacks (e.g. `(id: string) => ...`). Verify zero type errors with `tsc --noEmit` before committing.
-
-## 2026-09-29 - Scope Verification for Async Loading Attributes
-**Learning:** Blindly injecting `disabled={loading}` or `aria-busy={loading}` into JSX/TSX buttons causes fatal TypeScript compilation errors (`TS2304: Cannot find name 'loading'`) when `loading` is not declared in component props, state hooks (`useState`), or mutation results. Furthermore, using temporary patch scripts (`fix_*.cjs`) to manipulate source code pollutes the git index.
-**Action:** Before referencing any state identifier (such as `loading`, `isSubmitting`, `isPending`) in `disabled` or `aria-busy`, inspect the component scope. If no loading state is tracked, define it using `useState(false)` or check existing query/mutation hooks. Never bind undeclared variables. Always run `tsc --noEmit` locally and never commit temporary fix scripts.
 
 ## Additive Documentation & Scratch Cleanliness Directives
 - **Strictly Additive Journal Updates**: When updating `.jules/*.md`, strictly append new dated entries (`## YYYY-MM-DD - Title`). NEVER delete, truncate, or overwrite historical learnings or previous entries.

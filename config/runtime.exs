@@ -53,6 +53,16 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
+  # 🛡️ Sentinel: Fetch secure session signing salt dynamically at runtime
+  session_signing_salt =
+    System.get_env("SESSION_SIGNING_SALT") ||
+      raise """
+      environment variable SESSION_SIGNING_SALT is missing.
+      You can generate one by calling: mix phx.gen.secret
+      """
+
+  config :convo_sim, session_signing_salt: session_signing_salt
+
   host = System.get_env("PHX_HOST") || "example.com"
 
   config :convo_sim, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")

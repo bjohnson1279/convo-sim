@@ -191,10 +191,13 @@ defmodule ConvoSimWeb.DashboardLive do
             <button
               id="spawn-convo-btn"
               phx-click="spawn_conversation"
-              phx-disable-with="Spawning..."
-              class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+              class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phx-click-loading:opacity-50 phx-click-loading:cursor-not-allowed"
             >
-              <.icon name="hero-plus" class="w-4 h-4" /> Spawn Conversation
+              <.icon name="hero-plus" class="w-4 h-4 phx-click-loading:hidden" />
+              <.icon
+                name="hero-arrow-path"
+                class="w-4 h-4 hidden phx-click-loading:block motion-safe:animate-spin"
+              /> Spawn Conversation
             </button>
           </div>
         </div>
@@ -210,7 +213,7 @@ defmodule ConvoSimWeb.DashboardLive do
             class="hidden only:flex col-span-full flex-col items-center justify-center p-12 text-center bg-slate-900/50 border border-dashed border-slate-800 rounded-2xl"
           >
             <.icon name="hero-chat-bubble-oval-left" class="w-12 h-12 text-slate-400 mb-3" />
-            <h3 class="text-base font-semibold text-slate-300">No Active Conversations</h3>
+            <h2 class="text-base font-semibold text-slate-300">No Active Conversations</h2>
 
             <p class="text-sm text-slate-400 mt-1 max-w-sm mb-4">
               Launch lightweight GenServer processes on the BEAM VM to get started.
@@ -219,10 +222,13 @@ defmodule ConvoSimWeb.DashboardLive do
             <button
               id="empty-state-spawn-btn"
               phx-click="spawn_conversation"
-              phx-disable-with="Spawning..."
-              class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-xl transition border border-slate-700/60 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 shadow-sm"
+              class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-xl transition border border-slate-700/60 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 shadow-sm phx-click-loading:opacity-50 phx-click-loading:cursor-not-allowed"
             >
-              <.icon name="hero-plus" class="w-4 h-4" /> Spawn Conversation
+              <.icon name="hero-plus" class="w-4 h-4 phx-click-loading:hidden" />
+              <.icon
+                name="hero-arrow-path"
+                class="w-4 h-4 hidden phx-click-loading:block motion-safe:animate-spin"
+              /> Spawn Conversation
             </button>
           </li>
 
@@ -311,30 +317,35 @@ defmodule ConvoSimWeb.DashboardLive do
                 phx-click="send_message"
                 phx-value-id={convo.id}
                 disabled={convo.status == :responding}
-                phx-disable-with="Sending..."
                 title={
                   if(convo.status == :responding,
                     do: "Please wait for AI to finish responding before sending another message",
                     else: "Send Customer Message"
                   )
                 }
-                class="flex-1 py-1.5 px-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-200 text-xs font-medium rounded-lg transition border border-slate-700/60 flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                class="flex-1 py-1.5 px-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-200 text-xs font-medium rounded-lg transition border border-slate-700/60 flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phx-click-loading:opacity-50 phx-click-loading:cursor-not-allowed"
               >
-                <.icon name="hero-paper-airplane" class="w-3.5 h-3.5" />
-                Send Customer Message<span class="sr-only"> to conversation {convo.id}</span>
+                <.icon name="hero-paper-airplane" class="w-3.5 h-3.5 phx-click-loading:hidden" />
+                <.icon
+                  name="hero-arrow-path"
+                  class="w-3.5 h-3.5 hidden phx-click-loading:block motion-safe:animate-spin"
+                /> Send Customer Message<span class="sr-only"> to conversation {convo.id}</span>
               </button>
 
               <button
                 id={"stop-btn-#{convo.id}"}
                 phx-click="stop_conversation"
                 phx-value-id={convo.id}
-                phx-disable-with="Stopping..."
                 data-confirm="Are you sure you want to stop this conversation?"
                 aria-label={"Stop conversation #{convo.id}"}
                 title={"Stop conversation #{convo.id}"}
-                class="py-1.5 px-2.5 bg-red-950/40 hover:bg-red-900/60 text-red-400 text-xs font-medium rounded-lg transition border border-red-900/50 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                class="py-1.5 px-2.5 bg-red-950/40 hover:bg-red-900/60 text-red-400 text-xs font-medium rounded-lg transition border border-red-900/50 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phx-click-loading:opacity-50 phx-click-loading:cursor-not-allowed"
               >
-                <.icon name="hero-trash" class="w-3.5 h-3.5" />
+                <.icon name="hero-trash" class="w-3.5 h-3.5 phx-click-loading:hidden" />
+                <.icon
+                  name="hero-arrow-path"
+                  class="w-3.5 h-3.5 hidden phx-click-loading:block motion-safe:animate-spin"
+                />
               </button>
             </div>
           </li>
