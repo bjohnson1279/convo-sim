@@ -128,3 +128,8 @@
 - **Strict Lowercase Directory Casing**: Always write learning notes to lowercase `.jules/<bot>.md`. Never create, commit, or reference uppercase `.Jules/`.
 
 - **Clean Markdown Formatting**: Always append journal entries using actual newline characters, never literal string escape sequences `\n`.
+
+## 2026-10-13 - Restore Default CSP Protections When Overriding
+**Vulnerability:** A clickjacking vulnerability existed because the application overrode the `content-security-policy` in `put_secure_browser_headers` but failed to include `frame-ancestors 'none';`.
+**Learning:** In Phoenix, customizing the `"content-security-policy"` string in `put_secure_browser_headers` completely replaces the framework's default secure string, inadvertently dropping native protections like `frame-ancestors 'self'` and `base-uri 'self'` if they are not explicitly manually added back.
+**Prevention:** Whenever you customize standard security headers in Phoenix (like CSP), always inspect the framework's defaults and ensure you explicitly merge or restore critical protections like `frame-ancestors` and `base-uri`.
