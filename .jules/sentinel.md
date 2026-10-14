@@ -128,3 +128,7 @@
 - **Strict Lowercase Directory Casing**: Always write learning notes to lowercase `.jules/<bot>.md`. Never create, commit, or reference uppercase `.Jules/`.
 
 - **Clean Markdown Formatting**: Always append journal entries using actual newline characters, never literal string escape sequences `\n`.
+## 2024-10-14 - Fix Clickjacking vulnerability (Missing frame-ancestors)
+**Vulnerability:** The application was missing `frame-ancestors 'self'` and `base-uri 'self'` in its Content-Security-Policy (CSP) headers, exposing the site to clickjacking and base tag injection attacks.
+**Learning:** In Phoenix, customizing the `content-security-policy` string via `put_secure_browser_headers` completely overrides the framework's default secure string, inadvertently dropping native protections if not explicitly restored.
+**Prevention:** Always explicitly merge or restore default CSP directives like `frame-ancestors` and `base-uri` when customizing the `content-security-policy` header in `router.ex`.
