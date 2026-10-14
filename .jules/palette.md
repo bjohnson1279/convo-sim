@@ -126,3 +126,7 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 - **Strict Lowercase Directory Casing**: Always write learning notes to lowercase `.jules/<bot>.md`. Never create, commit, or reference uppercase `.Jules/`.
 
 - **Clean Markdown Formatting**: Always append journal entries using actual newline characters, never literal string escape sequences `\n`.
+
+## 2024-10-14 - Replace native disabled with aria-disabled on buttons
+**Learning:** Using native `disabled` on interactive elements like buttons removes them from the tab order, hiding helpful tooltips or context from screen reader users who need to know *why* an action is unavailable.
+**Action:** Use `aria-disabled="true"` combined with conditional `phx-click` to block the event in LiveView without triggering false loading states. Update Tailwind to target `aria-disabled:`.
