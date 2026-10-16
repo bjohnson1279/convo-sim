@@ -132,3 +132,7 @@
 **Vulnerability:** The application was missing `frame-ancestors 'self'` and `base-uri 'self'` in its Content-Security-Policy (CSP) headers, exposing the site to clickjacking and base tag injection attacks.
 **Learning:** In Phoenix, customizing the `content-security-policy` string via `put_secure_browser_headers` completely overrides the framework's default secure string, inadvertently dropping native protections if not explicitly restored.
 **Prevention:** Always explicitly merge or restore default CSP directives like `frame-ancestors` and `base-uri` when customizing the `content-security-policy` header in `router.ex`.
+## 2026-10-16 - [Update Bandit dependency]
+**Vulnerability:** bandit 1.12.5 had known vulnerabilities EEF-CVE-2026-105659 (HIGH) and EEF-CVE-2026-105660 (MEDIUM).
+**Learning:** These types of security issues might emerge when outdated dependencies are left in `mix.exs` unpinned or loosely pinned but locked behind in `mix.lock`.
+**Prevention:** Regularly check the deps with `mix hex.audit` to detect outdated packages with known vulnerabilities.
