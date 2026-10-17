@@ -101,3 +101,7 @@
 - **Strict Lowercase Directory Casing**: Always write learning notes to lowercase `.jules/<bot>.md`. Never create, commit, or reference uppercase `.Jules/`.
 
 - **Clean Markdown Formatting**: Always append journal entries using actual newline characters, never literal string escape sequences `\n`.
+
+## 2026-10-17 - [Optimizing Random Selection via Tuples]
+**Learning:** Using `Enum.random/1` on a list (even one cached in a module attribute) requires traversing the list structure, which is an O(N) operation and allocates temporary garbage collection objects.
+**Action:** For static configurations requiring random selection, define the items as a Tuple `{...}` instead of a List `[...]`, cache its size in another module attribute via `tuple_size/1`, and use `elem(tuple, :rand.uniform(size) - 1)` for O(1) random retrieval.
