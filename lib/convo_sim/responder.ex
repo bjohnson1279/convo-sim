@@ -32,7 +32,8 @@ defmodule ConvoSim.Responder.Simulated do
     # Sleep between 1000 and 4000 milliseconds to simulate AI processing time
     # The sleep happens in the calling process (which will be a Task, not the GenServer),
     # so it does not block the GenServer from handling other messages.
-    delay = :rand.uniform(3001) + 999 # Equivalent to Enum.random(1000..4000)
+    # Equivalent to Enum.random(1000..4000)
+    delay = :rand.uniform(3001) + 999
     Process.sleep(delay)
 
     elem(@canned_responses, :rand.uniform(@canned_responses_size) - 1)
