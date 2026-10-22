@@ -53,8 +53,8 @@ defmodule ConvoSimWeb.Layouts do
               href="https://phoenixframework.org/"
               target="_blank"
               rel="noopener noreferrer"
-              class="btn btn-ghost focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
-            >Website<span class="sr-only"> (opens in a new tab)</span></a>
+              class="btn btn-ghost flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
+            >Website<.icon name="hero-arrow-top-right-on-square" class="size-4 opacity-60" /><span class="sr-only"> (opens in a new tab)</span></a>
           </li>
 
           <li>
@@ -62,8 +62,8 @@ defmodule ConvoSimWeb.Layouts do
               href="https://github.com/phoenixframework/phoenix"
               target="_blank"
               rel="noopener noreferrer"
-              class="btn btn-ghost focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
-            >GitHub<span class="sr-only"> (opens in a new tab)</span></a>
+              class="btn btn-ghost flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
+            >GitHub<.icon name="hero-arrow-top-right-on-square" class="size-4 opacity-60" /><span class="sr-only"> (opens in a new tab)</span></a>
           </li>
 
           <li>
@@ -75,10 +75,10 @@ defmodule ConvoSimWeb.Layouts do
               href="https://phoenix.hexdocs.pm/overview.html"
               target="_blank"
               rel="noopener noreferrer"
-              class="btn btn-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
+              class="btn btn-primary flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
             >
               Get Started
-              <span aria-hidden="true">&rarr;</span><span class="sr-only"> (opens in a new tab)</span>
+              <.icon name="hero-arrow-top-right-on-square" class="size-4 opacity-60" /><span class="sr-only"> (opens in a new tab)</span>
             </a>
           </li>
         </ul>
