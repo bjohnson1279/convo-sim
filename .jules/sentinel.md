@@ -136,3 +136,7 @@
 **Vulnerability:** bandit 1.12.5 had known vulnerabilities EEF-CVE-2026-105659 (HIGH) and EEF-CVE-2026-105660 (MEDIUM).
 **Learning:** These types of security issues might emerge when outdated dependencies are left in `mix.exs` unpinned or loosely pinned but locked behind in `mix.lock`.
 **Prevention:** Regularly check the deps with `mix hex.audit` to detect outdated packages with known vulnerabilities.
+## 2024-05-24 - Fix EEF-CVE-2026-105963 in plug_crypto
+**Vulnerability:** The `plug_crypto` library (version 2.2.0) had a MEDIUM severity vulnerability (EEF-CVE-2026-105963) where the secret key base could be exposed in stack traces when passed wrong-typed arguments.
+**Learning:** Found by running `mix hex.audit`. In the Elixir ecosystem, dependency vulnerabilities are reported and managed via the Hex package manager, which provides a straightforward way to audit (`mix hex.audit`) and update dependencies.
+**Prevention:** Regularly run `mix hex.audit` (especially in CI pipelines) to monitor for new vulnerabilities in installed dependencies. Ensure that patch updates are applied promptly, as they are generally safe and adhere to strict semantic versioning.
