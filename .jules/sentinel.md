@@ -136,3 +136,7 @@
 **Vulnerability:** bandit 1.12.5 had known vulnerabilities EEF-CVE-2026-105659 (HIGH) and EEF-CVE-2026-105660 (MEDIUM).
 **Learning:** These types of security issues might emerge when outdated dependencies are left in `mix.exs` unpinned or loosely pinned but locked behind in `mix.lock`.
 **Prevention:** Regularly check the deps with `mix hex.audit` to detect outdated packages with known vulnerabilities.
+## 2026-10-25 - [Update plug_crypto dependency]
+**Vulnerability:** plug_crypto 2.2.0 had known vulnerability EEF-CVE-2026-105963 (MEDIUM): Secret key base exposed in stack trace arguments on wrong-typed Plug.Crypto arguments.
+**Learning:** These types of security issues might emerge when outdated dependencies are left in `mix.exs` unpinned or loosely pinned but locked behind in `mix.lock`.
+**Prevention:** Regularly check the deps with `mix hex.audit` to detect outdated packages with known vulnerabilities.
