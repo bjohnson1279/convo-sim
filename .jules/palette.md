@@ -133,3 +133,6 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## 2024-10-22 - Visual Indicator for External Links
 **Learning:** Adding standard icons for external links rather than just text (`Website`) or generic arrows (`&rarr;`) improves affordance, visually hinting to users that clicking the link will open a new tab/window, which is a key interaction expectation.
 **Action:** Always complement external links (`target="_blank" rel="noopener noreferrer"`) with a visual indicator like `hero-arrow-top-right-on-square` in addition to visually hidden screen reader text like `<span class="sr-only"> (opens in a new tab)</span>`.
+## 2024-11-20 - Match Instructional Text to Button Labels
+**Learning:** Empty states or instructional text that reference UI elements by name (e.g., 'Click "Send Message"') can easily drift out of sync with the actual button labels (e.g., 'Send Customer Message'), creating cognitive dissonance for users who are searching for an exact text match.
+**Action:** When updating a button label, always grep for the old label text across the codebase to ensure any instructional text, empty states, or tooltips referencing that button are updated to match identically.
