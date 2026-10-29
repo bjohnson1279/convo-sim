@@ -141,3 +141,8 @@
 **Vulnerability:** bandit 1.13.1 had known vulnerabilities (HIGH and MEDIUM severity) such as EEF-CVE-2026-108525, EEF-CVE-2026-109584, etc. Also, `plug_crypto` (version 2.2.0) had a MEDIUM severity vulnerability (EEF-CVE-2026-105963) where secret key base could be exposed in stack traces.
 **Learning:** These types of security issues emerge when dependencies are loosely pinned or locked to vulnerable versions.
 **Prevention:** Regularly check dependencies with `mix hex.audit` to detect packages with known vulnerabilities.
+
+## 2026-10-29 - [Fix memory amplification vulnerability in bandit]
+**Vulnerability:** bandit 1.14.0 had a known HIGH severity vulnerability (EEF-CVE-2026-116078) where HTTP/2 request bodies made of 1-byte DATA frames amplify memory use.
+**Learning:** These types of security issues emerge when dependencies are loosely pinned or locked to vulnerable versions, which is especially important to monitor for web servers exposed to untrusted traffic.
+**Prevention:** Regularly check dependencies with `mix hex.audit` to detect packages with known vulnerabilities and update them to patched versions (e.g. bandit 1.14.1).
