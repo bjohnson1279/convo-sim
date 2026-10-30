@@ -146,3 +146,7 @@
 **Vulnerability:** bandit 1.14.0 had a known HIGH severity vulnerability (EEF-CVE-2026-116078) where HTTP/2 request bodies made of 1-byte DATA frames amplify memory use.
 **Learning:** These types of security issues emerge when dependencies are loosely pinned or locked to vulnerable versions, which is especially important to monitor for web servers exposed to untrusted traffic.
 **Prevention:** Regularly check dependencies with `mix hex.audit` to detect packages with known vulnerabilities and update them to patched versions (e.g. bandit 1.14.1).
+## 2026-10-30 - Add Referrer-Policy header to CSP
+**Vulnerability:** The application was missing the `Referrer-Policy` header, potentially leaking sensitive URL paths or query parameters to external sites.
+**Learning:** In Phoenix applications, adding `"referrer-policy" => "strict-origin-when-cross-origin"` to the map in the `put_secure_browser_headers` plug pipeline in `router.ex` is a safe, effective security enhancement that protects user privacy.
+**Prevention:** Always include `Referrer-Policy` in the `put_secure_browser_headers` configuration when defining browser pipelines in `router.ex` to ensure defense-in-depth against data leakage.
