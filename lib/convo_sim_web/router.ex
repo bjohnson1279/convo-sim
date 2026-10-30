@@ -12,7 +12,8 @@ defmodule ConvoSimWeb.Router do
       "content-security-policy" =>
         "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'self'; base-uri 'self';",
       # 🛡️ Sentinel: Add Permissions-Policy header to restrict access to sensitive browser features
-      "permissions-policy" => "camera=(), microphone=(), geolocation=()"
+      "permissions-policy" => "camera=(), microphone=(), geolocation=()",
+      "referrer-policy" => "strict-origin-when-cross-origin"
     }
   end
 
