@@ -218,7 +218,7 @@ defmodule ConvoSimWeb.DashboardLive do
             <h2 class="text-base font-semibold text-slate-300">No Active Conversations</h2>
 
             <p class="text-sm text-slate-400 mt-1 max-w-sm mb-4">
-              Launch lightweight GenServer processes on the BEAM VM to get started.
+              Click "Spawn Conversation" to launch lightweight GenServer processes on the BEAM VM and get started.
             </p>
 
             <button
