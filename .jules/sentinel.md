@@ -146,3 +146,7 @@
 **Vulnerability:** bandit 1.14.0 had a known HIGH severity vulnerability (EEF-CVE-2026-116078) where HTTP/2 request bodies made of 1-byte DATA frames amplify memory use.
 **Learning:** These types of security issues emerge when dependencies are loosely pinned or locked to vulnerable versions, which is especially important to monitor for web servers exposed to untrusted traffic.
 **Prevention:** Regularly check dependencies with `mix hex.audit` to detect packages with known vulnerabilities and update them to patched versions (e.g. bandit 1.14.1).
+## 2024-10-31 - Fix Attribute Injection in Phoenix.HTML (CVE-2026-117645)
+**Vulnerability:** The application was using `phoenix_html` `~> 4.1` (resolved to `4.3.0`), which has a known attribute injection vulnerability in `attributes_escape/1` (EEF-CVE-2026-117645).
+**Learning:** `mix hex.audit` is crucial for detecting vulnerabilities in dependencies. The fix often requires explicitly updating the version constraint in `mix.exs` rather than just running `mix deps.update`. Also, Hex network operations can easily timeout; using `HEX_HTTP_TIMEOUT=120` is often necessary to successfully fetch the registry or update packages in automated environments.
+**Prevention:** Regularly run `mix hex.audit` in CI and keep core framework dependencies, especially those handling HTML rendering like `phoenix_html`, updated to their latest minor versions.
