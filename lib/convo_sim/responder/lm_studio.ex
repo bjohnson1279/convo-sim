@@ -25,22 +25,22 @@ defmodule ConvoSim.Responder.LMStudio do
   concise (2-3 sentences max). Be warm but professional.
   """
 
+  # ⚡ Bolt: Cache configs at compile-time to eliminate O(N) ETS lookup per API call
+  @base_url Application.compile_env(:convo_sim, :lm_studio_url, "http://127.0.0.1:1234")
+  @model Application.compile_env(:convo_sim, :lm_studio_model, "qwen2.5-coder-3b-instruct")
+
   @impl ConvoSim.Responder
   def respond(message, history) do
     # Build the messages array in OpenAI chat format
     # The history gives the AI context of the full conversation so far
     messages = build_messages(history, message)
 
-    # Get config — these are set in config/dev.exs
-    base_url = Application.get_env(:convo_sim, :lm_studio_url, "http://127.0.0.1:1234")
-    model = Application.get_env(:convo_sim, :lm_studio_model, "qwen2.5-coder-3b-instruct")
-
     # Make the API call using Req (the preferred Elixir HTTP client).
     # This call blocks the current process (a Task) until the response arrives,
     # but does NOT block the calling GenServer — that's the whole point.
-    case Req.post("#{base_url}/v1/chat/completions",
+    case Req.post("#{@base_url}/v1/chat/completions",
            json: %{
-             model: model,
+             model: @model,
              messages: messages,
              temperature: 0.7,
              max_tokens: 150

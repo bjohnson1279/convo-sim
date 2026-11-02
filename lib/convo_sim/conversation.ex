@@ -7,6 +7,9 @@ defmodule ConvoSim.Conversation do
   # State struct definition for cleaner access and default values
   defstruct id: nil, status: :idle, messages: [], message_count: 0, created_at: nil
 
+  # ⚡ Bolt: Cache responder config at compile-time to eliminate O(N) ETS lookup per message
+  @responder Application.compile_env(:convo_sim, :responder, ConvoSim.Responder.Simulated)
+
   # --- Public API ---
 
   @doc """
@@ -119,7 +122,7 @@ defmodule ConvoSim.Conversation do
 
       # Spawn a Task for the AI response so we don't block the GenServer.
       # The GenServer can still process other messages while waiting.
-      responder = Application.get_env(:convo_sim, :responder, ConvoSim.Responder.Simulated)
+      responder = @responder
       pid = self()
 
       Task.start(fn ->
