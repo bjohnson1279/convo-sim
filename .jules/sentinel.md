@@ -156,3 +156,8 @@
 **Vulnerability:** The application was using `phoenix_html` `~> 4.1` (resolved to `4.3.0`), which has a known attribute injection vulnerability in `attributes_escape/1` (EEF-CVE-2026-117645).
 **Learning:** `mix hex.audit` is crucial for detecting vulnerabilities in dependencies. The fix often requires explicitly updating the version constraint in `mix.exs` rather than just running `mix deps.update`.
 **Prevention:** Regularly run `mix hex.audit` in CI and keep core framework dependencies, especially those handling HTML rendering like `phoenix_html`, updated to their latest minor versions.
+
+## 2026-11-02 - Remove unsafe-inline from script-src in CSP
+**Vulnerability:** The Content-Security-Policy header in the browser pipeline had `script-src 'self' 'unsafe-inline'`, which allowed inline scripts to run and increased the risk of Cross-Site Scripting (XSS) attacks.
+**Learning:** `unsafe-inline` was kept to allow a small theme toggle script in `root.html.heex`. This inline script can be safely extracted to an external file (e.g., `theme.js`) and compiled via esbuild to remove `unsafe-inline` from CSP rules.
+**Prevention:** Always extract inline scripts to external JavaScript files and use strict CSP directives (e.g. `script-src 'self'`) to enforce security without breaking functionality. Ensure the new script is not deferred to prevent a Flash of Unstyled Content (FOUC).
