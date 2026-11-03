@@ -1,7 +1,11 @@
 defmodule ConvoSim.ConversationManager do
   @moduledoc """
-  Facade module to manage conversation lifecycles via DynamicSupervisor and Registry.
-  This module itself is NOT a process, just a collection of functions acting as the API.
+  Facade module managing conversation lifecycles via DynamicSupervisor and Registry.
+
+  This module coordinates conversation processes (`ConvoSim.Conversation`) supervised
+  by `ConvoSim.ConversationSupervisor` and indexed in `ConvoSim.ConversationRegistry`.
+  It is not a stateful process itself, but provides public API functions for starting,
+  stopping, and querying conversation states without N+1 process call bottlenecks.
   """
 
   @doc """
@@ -13,11 +17,7 @@ defmodule ConvoSim.ConversationManager do
     if Registry.count(ConvoSim.ConversationRegistry) >= 50 do
       {:error, :too_many_conversations}
     else
-      # Generate a short readable ID (e.g., "conv-" <> first 8 chars of a UUID)
-      # Using Ecto.UUID if available, or just purely Erlang's unique id generator if not.
-      # Let's use :crypto.strong_rand_bytes to avoid depending on Ecto just for UUIDs.
-      # ⚡ Bolt: Generate 4 bytes instead of 16 to avoid entropy depletion and eliminate
-      # O(N) String.slice/3 allocation of intermediate 32-char string.
+      # ⚡ Bolt: Generate 4 random bytes directly to avoid entropy depletion and intermediate string slicing.
       id = "conv-" <> Base.encode16(:crypto.strong_rand_bytes(4), case: :lower)
 
       # Start the child dynamically under our supervisor
