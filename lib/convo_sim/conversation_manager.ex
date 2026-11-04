@@ -18,7 +18,7 @@ defmodule ConvoSim.ConversationManager do
       {:error, :too_many_conversations}
     else
       # ⚡ Bolt: Generate 4 random bytes directly to avoid entropy depletion and intermediate string slicing.
-      id = "conv-" <> Base.encode16(:crypto.strong_rand_bytes(4), case: :lower)
+      id = "conv-" <> Base.encode16(:crypto.strong_rand_bytes(16), case: :lower)
 
       # Start the child dynamically under our supervisor
       # The child spec is based on ConvoSim.Conversation's use of GenServer

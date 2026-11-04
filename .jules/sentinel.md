@@ -161,3 +161,8 @@
 **Vulnerability:** The application was using `'unsafe-inline'` in its Content-Security-Policy (CSP) headers for `script-src` and `style-src`, exposing the site to Cross-Site Scripting (XSS) attacks.
 **Learning:** In Phoenix applications, inline scripts (like theme toggles in `root.html.heex`) can be extracted to external files (e.g., `theme.js`) to eliminate the need for `'unsafe-inline'`. Ensure these extracted scripts are not deferred to prevent a Flash of Unstyled Content (FOUC).
 **Prevention:** Always extract inline scripts and styles into separate files, and configure `put_secure_browser_headers` without `'unsafe-inline'` to enforce strict CSP directives and protect against XSS.
+
+## 2026-11-03 - Prevent IDOR by increasing conversation ID entropy
+**Vulnerability:** 4-byte random tokens (8 hex characters) provided only 32 bits of entropy, allowing brute-force ID guessing or IDOR attacks in multi-user environments.
+**Learning:** Generating 16 cryptographically secure random bytes (32 hex characters / 128-bit entropy) makes IDs unguessable while maintaining sub-microsecond generation speed.
+**Action:** Use `:crypto.strong_rand_bytes(16)` when generating unique public-facing session/conversation identifiers.
