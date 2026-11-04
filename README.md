@@ -15,6 +15,8 @@ Each active customer conversation runs as an isolated GenServer process under a 
   - `ConvoSim.Responder.Simulated`: Offline responder providing simulated AI responses with randomized realistic typing latency.
 - **`ConvoSimWeb.DashboardLive`**: Real-time Phoenix LiveView dashboard consuming PubSub updates and rendering streamed conversation cards.
 
+For an in-depth breakdown of process isolation, supervision trees, O(1) state caching in Registry, and message flow, see the [Architecture Guide](docs/architecture.md).
+
 ---
 
 ## Prerequisites
