@@ -3,128 +3,166 @@ defmodule ConvoSim.Responder.LMStudioTest do
 
   alias ConvoSim.Responder.LMStudio
 
-  setup do
-    # Ensure port 1234 is clean before each test if any prior process was running
-    :ok
+  @port 1234
+  @ip {127, 0, 0, 1}
+
+  defp start_mock_server!(plug_fun) do
+    # Bandit child specification using start_supervised! to guarantee cleanup
+    child_spec = {Bandit, plug: plug_fun, port: @port, ip: @ip}
+    start_supervised!(child_spec)
   end
 
-  defmodule StubServer do
-    def init(opts), do: opts
+  describe "respond/2" do
+    test "handles successful 200 OK response and extracts content" do
+      test_pid = self()
 
-    def call(conn, _opts) do
-      {:ok, body, conn} = Plug.Conn.read_body(conn)
-      decoded_body = if body != "", do: Jason.decode!(body), else: %{}
+      start_mock_server!(fn conn, _opts ->
+        {:ok, body, conn} = Plug.Conn.read_body(conn)
+        send(test_pid, {:received_payload, Jason.decode!(body)})
 
-      # Retrieve handler or status configured for this test run
-      handler = Application.get_env(:convo_sim, :stub_handler)
+        json_reply =
+          Jason.encode!(%{
+            "choices" => [
+              %{"message" => %{"content" => "Hello! How can I assist you?"}}
+            ]
+          })
 
-      case handler do
-        nil ->
-          conn
-          |> Plug.Conn.put_resp_content_type("application/json")
-          |> Plug.Conn.send_resp(
-            200,
-            Jason.encode!(%{
-              "choices" => [
-                %{"message" => %{"content" => "Hello from AI assistant!"}}
-              ]
-            })
-          )
+        conn
+        |> Plug.Conn.put_resp_content_type("application/json")
+        |> Plug.Conn.resp(200, json_reply)
+      end)
 
-        fun when is_function(fun, 2) ->
-          fun.(conn, decoded_body)
-      end
+      # Test with conversation history containing both customer and assistant roles
+      # Note: history in Conversation GenServer is stored newest-first
+      history = [
+        %{role: :assistant, content: "What is your order number?"},
+        %{role: :customer, content: "I need to check order status."}
+      ]
+
+      response = LMStudio.respond("My order number is 12345", history)
+
+      assert response == "Hello! How can I assist you?"
+
+      assert_receive {:received_payload, payload}
+      assert payload["model"] == "qwen2.5-coder-3b-instruct"
+      assert payload["temperature"] == 0.7
+      assert payload["max_tokens"] == 150
+
+      # Verify message structure:
+      # [0] System prompt
+      # [1] Customer message ("I need to check order status.") -> role: "user"
+      # [2] Assistant message ("What is your order number?") -> role: "assistant"
+      # [3] Current message ("My order number is 12345") -> role: "user"
+      messages = payload["messages"]
+      assert length(messages) == 4
+
+      [system_msg, prev_user, prev_assistant, current_msg] = messages
+      assert system_msg["role"] == "system"
+      assert system_msg["content"] =~ "customer support assistant"
+
+      assert prev_user["role"] == "user"
+      assert prev_user["content"] == "I need to check order status."
+
+      assert prev_assistant["role"] == "assistant"
+      assert prev_assistant["content"] == "What is your order number?"
+
+      assert current_msg["role"] == "user"
+      assert current_msg["content"] == "My order number is 12345"
     end
-  end
 
-  test "gracefully handles connection failure with error message" do
-    # When no server is running on port 1234, LMStudio returns internal error message
-    response = LMStudio.respond("Hello", [])
-    assert response =~ "I'm sorry, I encountered an internal error"
-  end
+    test "handles other/custom roles in history by mapping them to assistant" do
+      test_pid = self()
 
-  test "successfully parses 200 OK OpenAI format response and sends conversation history" do
-    test_pid = self()
+      start_mock_server!(fn conn, _opts ->
+        {:ok, body, conn} = Plug.Conn.read_body(conn)
+        send(test_pid, {:received_payload, Jason.decode!(body)})
 
-    Application.put_env(:convo_sim, :stub_handler, fn conn, decoded_body ->
-      send(test_pid, {:received_request, decoded_body})
+        json_reply =
+          Jason.encode!(%{
+            "choices" => [
+              %{"message" => %{"content" => "Custom role handled."}}
+            ]
+          })
 
-      conn
-      |> Plug.Conn.put_resp_content_type("application/json")
-      |> Plug.Conn.send_resp(
-        200,
-        Jason.encode!(%{
-          "choices" => [
-            %{
-              "message" => %{
-                "role" => "assistant",
-                "content" => "I can certainly help you with your account!"
-              }
-            }
-          ]
-        })
-      )
-    end)
+        conn
+        |> Plug.Conn.put_resp_content_type("application/json")
+        |> Plug.Conn.resp(200, json_reply)
+      end)
 
-    on_exit(fn -> Application.delete_env(:convo_sim, :stub_handler) end)
+      history = [
+        %{role: :custom_agent, content: "Custom agent prompt."}
+      ]
 
-    start_supervised!({Bandit, plug: StubServer, port: 1234})
+      response = LMStudio.respond("Follow-up inquiry", history)
 
-    history = [
-      %{role: :assistant, content: "Previous answer"},
-      %{role: :customer, content: "Previous question"}
-    ]
+      assert response == "Custom role handled."
 
-    response = LMStudio.respond("Current question", history)
+      assert_receive {:received_payload, payload}
+      [_system_msg, custom_msg, _current_msg] = payload["messages"]
+      assert custom_msg["role"] == "assistant"
+      assert custom_msg["content"] == "Custom agent prompt."
+    end
 
-    assert response == "I can certainly help you with your account!"
+    test "returns fallback when 200 OK has empty choices or unexpected body shape" do
+      start_mock_server!(fn conn, _opts ->
+        json_reply =
+          Jason.encode!(%{
+            "choices" => []
+          })
 
-    assert_receive {:received_request, req_body}
-    assert req_body["model"] == "qwen2.5-coder-3b-instruct"
-    messages = req_body["messages"]
+        conn
+        |> Plug.Conn.put_resp_content_type("application/json")
+        |> Plug.Conn.resp(200, json_reply)
+      end)
 
-    # History is newest-first in arguments:
-    # hd is %{role: :assistant, content: "Previous answer"}
-    # tl is %{role: :customer, content: "Previous question"}
-    # build_messages should order them chronologically:
-    # 1. System prompt
-    # 2. Previous question (user)
-    # 3. Previous answer (assistant)
-    # 4. Current question (user)
-    assert length(messages) == 4
-    assert Enum.at(messages, 0)["role"] == "system"
-    assert Enum.at(messages, 1) == %{"role" => "user", "content" => "Previous question"}
-    assert Enum.at(messages, 2) == %{"role" => "assistant", "content" => "Previous answer"}
-    assert Enum.at(messages, 3) == %{"role" => "user", "content" => "Current question"}
-  end
+      response = LMStudio.respond("Hello", [])
+      assert response == "I'm sorry, I couldn't generate a response."
+    end
 
-  test "handles 200 OK with malformed choices structure gracefully" do
-    Application.put_env(:convo_sim, :stub_handler, fn conn, _decoded ->
-      conn
-      |> Plug.Conn.put_resp_content_type("application/json")
-      |> Plug.Conn.send_resp(200, Jason.encode!(%{"choices" => []}))
-    end)
+    test "returns fallback when 200 OK choices contain non-binary content" do
+      start_mock_server!(fn conn, _opts ->
+        json_reply =
+          Jason.encode!(%{
+            "choices" => [
+              %{"message" => %{"content" => nil}}
+            ]
+          })
 
-    on_exit(fn -> Application.delete_env(:convo_sim, :stub_handler) end)
+        conn
+        |> Plug.Conn.put_resp_content_type("application/json")
+        |> Plug.Conn.resp(200, json_reply)
+      end)
 
-    start_supervised!({Bandit, plug: StubServer, port: 1234})
+      response = LMStudio.respond("Hello", [])
+      assert response == "I'm sorry, I couldn't generate a response."
+    end
 
-    response = LMStudio.respond("Hello", [])
-    assert response == "I'm sorry, I couldn't generate a response."
-  end
+    test "handles non-200 HTTP error responses gracefully" do
+      start_mock_server!(fn conn, _opts ->
+        conn
+        |> Plug.Conn.put_resp_content_type("application/json")
+        |> Plug.Conn.resp(500, Jason.encode!(%{"error" => "Internal model crash"}))
+      end)
 
-  test "handles non-200 HTTP response codes from LM Studio" do
-    Application.put_env(:convo_sim, :stub_handler, fn conn, _decoded ->
-      conn
-      |> Plug.Conn.put_resp_content_type("application/json")
-      |> Plug.Conn.send_resp(500, Jason.encode!(%{"error" => "Internal model error"}))
-    end)
+      response = LMStudio.respond("Hello", [])
+      assert response =~ "I'm sorry, I encountered an internal error"
+    end
 
-    on_exit(fn -> Application.delete_env(:convo_sim, :stub_handler) end)
+    test "handles HTTP 429 rate limit or 400 bad request error responses" do
+      start_mock_server!(fn conn, _opts ->
+        conn
+        |> Plug.Conn.put_resp_content_type("application/json")
+        |> Plug.Conn.resp(429, Jason.encode!(%{"error" => "Too Many Requests"}))
+      end)
 
-    start_supervised!({Bandit, plug: StubServer, port: 1234})
+      response = LMStudio.respond("Hello", [])
+      assert response =~ "I'm sorry, I encountered an internal error"
+    end
 
-    response = LMStudio.respond("Hello", [])
-    assert response =~ "I'm sorry, I encountered an internal error"
+    test "gracefully handles connection failure when server is unreachable" do
+      # Since no mock server is started in this test on port 1234, the connection fails with :econnrefused
+      response = LMStudio.respond("Hello", [])
+      assert response =~ "I'm sorry, I encountered an internal error"
+    end
   end
 end
