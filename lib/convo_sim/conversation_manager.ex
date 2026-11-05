@@ -17,7 +17,7 @@ defmodule ConvoSim.ConversationManager do
     if Registry.count(ConvoSim.ConversationRegistry) >= 50 do
       {:error, :too_many_conversations}
     else
-      # ⚡ Bolt: Generate 4 random bytes directly to avoid entropy depletion and intermediate string slicing.
+      # ⚡ Bolt: Generate 16 random bytes directly to avoid entropy depletion and intermediate string slicing.
       id = "conv-" <> Base.encode16(:crypto.strong_rand_bytes(16), case: :lower)
 
       # Start the child dynamically under our supervisor
