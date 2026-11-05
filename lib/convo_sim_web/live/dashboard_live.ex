@@ -242,13 +242,20 @@ defmodule ConvoSimWeb.DashboardLive do
             <%!-- Card Header --%>
             <div class="flex items-center justify-between pb-3 border-b border-slate-800/80">
               <div class="flex items-center gap-2">
-                <span class="font-mono text-xs font-semibold px-2.5 py-1 bg-slate-800 text-indigo-300 rounded-lg border border-slate-700/50">
+                <h3 class="font-mono text-xs font-semibold px-2.5 py-1 bg-slate-800 text-indigo-300 rounded-lg border border-slate-700/50 m-0 leading-normal">
                   <span class="sr-only">Conversation ID: </span>{convo.id}
-                </span>
+                </h3>
 
                 <span class="text-xs text-slate-400">
                   <%!-- ⚡ Bolt: Use O(1) cached message_count instead of O(N) length() --%> {convo.message_count}
-                  <span aria-hidden="true">msgs</span><span class="sr-only">messages</span>
+                  <span aria-hidden="true">{if convo.message_count == 1, do: "msg", else: "msgs"}</span>
+                  <span class="sr-only">
+                    <%= if convo.message_count == 1 do %>
+                      message
+                    <% else %>
+                      messages
+                    <% end %>
+                  </span>
                 </span>
               </div>
               <%!-- Status Pill --%>
