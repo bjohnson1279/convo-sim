@@ -204,8 +204,10 @@ defmodule ConvoSimWeb.DashboardLive do
           </div>
         </div>
         <%!-- Conversation Cards Grid --%>
+        <h2 id="conversations-heading" class="sr-only">Active Conversations</h2>
         <ul
           id="conversations"
+          aria-labelledby="conversations-heading"
           phx-update="stream"
           role="list"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 list-none p-0"
@@ -215,7 +217,7 @@ defmodule ConvoSimWeb.DashboardLive do
             class="hidden only:flex col-span-full flex-col items-center justify-center p-12 text-center bg-slate-900/50 border border-dashed border-slate-800 rounded-2xl"
           >
             <.icon name="hero-chat-bubble-oval-left" class="w-12 h-12 text-slate-400 mb-3" />
-            <h2 class="text-base font-semibold text-slate-300">No Active Conversations</h2>
+            <h3 class="text-base font-semibold text-slate-300">No Active Conversations</h3>
 
             <p class="text-sm text-slate-400 mt-1 max-w-sm mb-4">
               Click "Spawn Conversation" to launch lightweight GenServer processes on the BEAM VM and get started.

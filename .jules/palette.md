@@ -143,3 +143,6 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## 2024-11-20 - Use Conditional Pluralization for Screen Reader Text
 **Learning:** Hardcoding plural text strings (e.g. `msgs` and `messages`) when the count can be singular leads to grammatical confusion for users, particularly those relying on screen readers.
 **Action:** Always implement dynamic logic to switch between singular and plural terms based on the associated count variable (e.g. `{if count == 1, do: "message", else: "messages"}`).
+## 2024-11-20 - Ensure Dynamic Card Lists Use Proper Heading Hierarchy
+**Learning:** Using semantic HTML elements like `<h3>` within dynamic card lists, rather than generic elements like `<span>`, creates a significantly better experience for screen reader users by allowing them to navigate the page structure properly, provided the hierarchy cascades correctly from higher-level headings.
+**Action:** Always verify semantic heading structures within list items or dynamic cards. If a container like a `<ul>` lacks a direct preceding heading but contains card headings, introduce a visually hidden `<h2>` (e.g., `sr-only`) and associate it with the list via `aria-labelledby` to prevent hierarchy skips.
