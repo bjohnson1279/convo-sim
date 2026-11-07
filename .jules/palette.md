@@ -146,3 +146,6 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## 2024-11-20 - Ensure Dynamic Card Lists Use Proper Heading Hierarchy
 **Learning:** Using semantic HTML elements like `<h3>` within dynamic card lists, rather than generic elements like `<span>`, creates a significantly better experience for screen reader users by allowing them to navigate the page structure properly, provided the hierarchy cascades correctly from higher-level headings.
 **Action:** Always verify semantic heading structures within list items or dynamic cards. If a container like a `<ul>` lacks a direct preceding heading but contains card headings, introduce a visually hidden `<h2>` (e.g., `sr-only`) and associate it with the list via `aria-labelledby` to prevent hierarchy skips.
+## 2024-11-20 - Add aria-pressed state to theme toggle and enforce button types
+**Learning:** For custom JS toggle groups like theme switchers, screen readers need to know which toggle is currently active. Furthermore, standalone action buttons should always explicitly define `type="button"` to prevent accidental form submission behavior if they ever become wrapped in a `<form>` element.
+**Action:** Use `aria-pressed="true"`/`"false"` bound to the active state for custom toggles, and enforce `type="button"` on all standalone action buttons in the layout and LiveView components.
