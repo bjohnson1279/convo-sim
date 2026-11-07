@@ -191,6 +191,7 @@ defmodule ConvoSimWeb.DashboardLive do
 
           <div>
             <button
+              type="button"
               id="spawn-convo-btn"
               phx-click="spawn_conversation"
               class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phx-click-loading:opacity-50 phx-click-loading:cursor-not-allowed"
@@ -224,6 +225,7 @@ defmodule ConvoSimWeb.DashboardLive do
             </p>
 
             <button
+              type="button"
               id="empty-state-spawn-btn"
               phx-click="spawn_conversation"
               class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-xl transition border border-slate-700/60 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 shadow-sm phx-click-loading:opacity-50 phx-click-loading:cursor-not-allowed"
@@ -324,6 +326,7 @@ defmodule ConvoSimWeb.DashboardLive do
             <%!-- Card Actions --%>
             <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
               <button
+                type="button"
                 id={"send-btn-#{convo.id}"}
                 phx-click={if convo.status == :responding, do: nil, else: "send_message"}
                 phx-value-id={convo.id}
@@ -344,6 +347,7 @@ defmodule ConvoSimWeb.DashboardLive do
               </button>
 
               <button
+                type="button"
                 id={"stop-btn-#{convo.id}"}
                 phx-click="stop_conversation"
                 phx-value-id={convo.id}

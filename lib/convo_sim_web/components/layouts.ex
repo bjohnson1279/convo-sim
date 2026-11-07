@@ -151,9 +151,11 @@ defmodule ConvoSimWeb.Layouts do
     <div class="card relative flex flex-row items-center border-2 border-base-300 bg-base-300 rounded-full">
       <div class="absolute w-1/3 h-full rounded-full border-1 border-base-200 bg-base-100 brightness-200 left-0 [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3 [[data-theme-source=system]_&]:!left-0 transition-[left]" />
       <button
+        type="button"
         class="flex p-2 cursor-pointer w-1/3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-base-300 rounded-full"
         phx-click={JS.dispatch("phx:set-theme")}
         data-phx-theme="system"
+        aria-pressed="false"
         aria-label="System Theme"
         title="System Theme"
       >
@@ -161,9 +163,11 @@ defmodule ConvoSimWeb.Layouts do
       </button>
 
       <button
+        type="button"
         class="flex p-2 cursor-pointer w-1/3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-base-300 rounded-full"
         phx-click={JS.dispatch("phx:set-theme")}
         data-phx-theme="light"
+        aria-pressed="false"
         aria-label="Light Theme"
         title="Light Theme"
       >
@@ -171,9 +175,11 @@ defmodule ConvoSimWeb.Layouts do
       </button>
 
       <button
+        type="button"
         class="flex p-2 cursor-pointer w-1/3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-base-300 rounded-full"
         phx-click={JS.dispatch("phx:set-theme")}
         data-phx-theme="dark"
+        aria-pressed="false"
         aria-label="Dark Theme"
         title="Dark Theme"
       >
