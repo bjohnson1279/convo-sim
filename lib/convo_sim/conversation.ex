@@ -1,25 +1,23 @@
 defmodule ConvoSim.Conversation do
   @moduledoc """
-  A GenServer representing a single customer conversation.
+  GenServer representing an isolated customer conversation process.
+
+  Maintains conversation history and status, caches state in `Registry` for O(1)
+  lookups, broadcasts events over PubSub, and delegates AI responses to background tasks.
   """
   use GenServer
 
-  # State struct definition for cleaner access and default values
   defstruct id: nil, status: :idle, messages: [], message_count: 0, created_at: nil
 
-  # ⚡ Bolt: Cache responder config at compile-time to eliminate O(N) ETS lookup per message
+  # ⚡ Bolt: Cache responder config at compile-time to eliminate ETS lookup per message
   @responder Application.compile_env(:convo_sim, :responder, ConvoSim.Responder.Simulated)
-
-  # --- Public API ---
 
   @doc """
   Starts a new conversation GenServer process.
   Registers the process with the ConversationRegistry using a 'via tuple'.
   """
   def start_link(id) do
-    # The :via tuple is a way to register a process under a custom name,
-    # in this case using our custom Registry instead of a global atom.
-    # We include the initial state in the registry value to allow O(1) state fetching.
+    # Register via Registry with initial state value for O(1) reads without mailbox queuing.
     name = {:via, Registry, {ConvoSim.ConversationRegistry, id, %__MODULE__{id: id}}}
     GenServer.start_link(__MODULE__, id, name: name)
   end
@@ -28,17 +26,13 @@ defmodule ConvoSim.Conversation do
   Gets the current state of a conversation by id.
   """
   def get_state(id) do
-    # ⚡ Bolt: O(1) state fetching via native ETS lookup.
-    # Instead of sending a synchronous GenServer.call and blocking on the process's message queue,
-    # we can fetch the state directly from the Registry value since we keep it updated there.
+    # Fetch state directly from Registry ETS table to avoid blocking the GenServer mailbox.
     case Registry.lookup(ConvoSim.ConversationRegistry, id) do
       [{_pid, state}] ->
         state
 
       [] ->
-        # Fallback for process not found or error cases
-        # If the registry is empty, we must fallback to the original GenServer.call
-        # so it fails with a noproc exit as expected by the existing API contract.
+        # Fall back to synchronous GenServer call to retain expected noproc exit semantics.
         GenServer.call({:via, Registry, {ConvoSim.ConversationRegistry, id}}, :get_state)
     end
   end
@@ -49,7 +43,7 @@ defmodule ConvoSim.Conversation do
   def send_message(id, content)
       when is_binary(id) and byte_size(id) <= 64 and is_binary(content) and
              byte_size(content) <= 4000 do
-    # Using cast because we don't need to block waiting for the result.
+    # Cast asynchronously so callers are not blocked waiting on response generation.
     GenServer.cast(
       {:via, Registry, {ConvoSim.ConversationRegistry, id}},
       {:customer_message, content}
@@ -57,11 +51,9 @@ defmodule ConvoSim.Conversation do
   end
 
   def send_message(_id, _content) do
-    # 🛡️ Sentinel: Reject excessively large or invalid payloads strictly
+    # Reject oversized identifiers or content payloads exceeding length thresholds.
     {:error, :content_too_large}
   end
-
-  # --- GenServer Callbacks ---
 
   @impl GenServer
   def init(id) do
@@ -73,10 +65,9 @@ defmodule ConvoSim.Conversation do
       created_at: DateTime.utc_now()
     }
 
-    # Store the complete initial state in the Registry value for O(1) fetching
+    # Store initial state in Registry for O(1) external lookups.
     Registry.update_value(ConvoSim.ConversationRegistry, state.id, fn _ -> state end)
 
-    # Broadcast that the conversation started to the global topic
     broadcast("conversations", state)
 
     {:ok, state}
@@ -84,7 +75,7 @@ defmodule ConvoSim.Conversation do
 
   @impl GenServer
   def handle_call(:get_state, _from, state) do
-    # ⚡ Bolt: Return prepended state directly to avoid O(N) Enum.reverse/1 blocking the GenServer
+    # Return state directly to avoid O(N) list reversals in the process loop.
     {:reply, state, state}
   end
 
@@ -105,8 +96,7 @@ defmodule ConvoSim.Conversation do
         timestamp: DateTime.utc_now()
       }
 
-      # Prepend instead of append (O(1) instead of O(N))
-      # ⚡ Bolt: We cache message_count to avoid O(N) length() calls in the UI
+      # Prepend message and increment cached count to avoid O(N) list operations.
       new_state = %{
         state
         | messages: [customer_msg | state.messages],
@@ -114,21 +104,18 @@ defmodule ConvoSim.Conversation do
           status: :responding
       }
 
-      # Update state in Registry for O(1) fetching
+      # Sync updated state to Registry for O(1) external lookups.
       Registry.update_value(ConvoSim.ConversationRegistry, new_state.id, fn _ -> new_state end)
 
-      # Broadcast status change
       broadcast_all(new_state)
 
-      # Spawn a Task for the AI response so we don't block the GenServer.
-      # The GenServer can still process other messages while waiting.
+      # Offload AI response generation to a background task to prevent blocking the GenServer.
       responder = @responder
       pid = self()
 
       Task.start(fn ->
-        # ⚡ Bolt: Pass newest-first history directly without Enum.reverse/1
+        # Pass newest-first history directly to avoid redundant list reversal.
         response = responder.respond(content, state.messages)
-        # Send the result back to the GenServer using standard Erlang messaging
         send(pid, {:ai_response, response})
       end)
 
@@ -144,8 +131,7 @@ defmodule ConvoSim.Conversation do
       timestamp: DateTime.utc_now()
     }
 
-    # Prepend instead of append (O(1) instead of O(N))
-    # ⚡ Bolt: We cache message_count to avoid O(N) length() calls in the UI
+    # Prepend assistant response and increment cached message count.
     new_state = %{
       state
       | messages: [ai_msg | state.messages],
@@ -153,7 +139,7 @@ defmodule ConvoSim.Conversation do
         status: :idle
     }
 
-    # Update state in Registry for O(1) fetching
+    # Sync updated state to Registry for O(1) external lookups.
     Registry.update_value(ConvoSim.ConversationRegistry, new_state.id, fn _ -> new_state end)
 
     broadcast_all(new_state)
@@ -161,20 +147,12 @@ defmodule ConvoSim.Conversation do
     {:noreply, new_state}
   end
 
-  # --- Private Helpers ---
-
   defp broadcast_all(state) do
-    # ⚡ Bolt: Broadcast prepended state directly to avoid O(N) Enum.reverse/1 on every message
-    # The UI will use CSS flex-col-reverse to display them chronologically
-
-    # Broadcast to global topic
     broadcast("conversations", state)
-    # Broadcast to per-conversation topic
     broadcast("conversation:#{state.id}", state)
   end
 
   defp broadcast(topic, state) do
-    # Broadcast payloads should be: {:conversation_updated, id, state} for simplicity
     Phoenix.PubSub.broadcast(ConvoSim.PubSub, topic, {:conversation_updated, state.id, state})
   end
 end
