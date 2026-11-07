@@ -5,11 +5,13 @@ defmodule ConvoSim.Application do
 
   use Application
 
+  @dns_cluster_query Application.compile_env(:convo_sim, :dns_cluster_query, :ignore)
+
   @impl true
   def start(_type, _args) do
     children = [
       ConvoSimWeb.Telemetry,
-      {DNSCluster, query: Application.get_env(:convo_sim, :dns_cluster_query) || :ignore},
+      {DNSCluster, query: @dns_cluster_query},
       {Phoenix.PubSub, name: ConvoSim.PubSub},
       {Registry, keys: :unique, name: ConvoSim.ConversationRegistry},
       {DynamicSupervisor, strategy: :one_for_one, name: ConvoSim.ConversationSupervisor},
