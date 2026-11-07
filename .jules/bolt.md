@@ -109,3 +109,7 @@
 ## 2026-11-02 - Extracting Dynamic Configs to Compile-Time Attributes for Performance
 **Learning:** In Elixir, using `Application.get_env/3` inside hot paths (e.g., inside `handle_cast` or repeated API calls) incurs a small but cumulative ETS lookup overhead for every invocation. If these configuration values are statically defined and do not change dynamically at runtime, fetching them repeatedly is inefficient.
 **Action:** Replace `Application.get_env/3` inside hot paths with module attributes initialized using `Application.compile_env/3`. This bakes the configuration into the module at compile time, completely eliminating the ETS lookup overhead during runtime.
+
+## 2026-11-07 - Extracting Dynamic Configs to Compile-Time Attributes for Performance
+**Learning:** In Elixir, using `Application.get_env/3` inside hot paths or during application startup (e.g., in `Application.start/2`) incurs a small but cumulative ETS lookup overhead for every invocation. If these configuration values are statically defined and do not change dynamically at runtime, fetching them repeatedly is inefficient.
+**Action:** Replace `Application.get_env/3` with module attributes initialized using `Application.compile_env/3`. This bakes the configuration into the module at compile time, completely eliminating the ETS lookup overhead during runtime.
