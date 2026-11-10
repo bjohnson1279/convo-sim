@@ -19,7 +19,7 @@ config :convo_sim, ConvoSimWeb.Endpoint,
     layout: false
   ],
   pubsub_server: ConvoSim.PubSub,
-  live_view: [signing_salt: "kNPzqRSx"]
+  live_view: [signing_salt: System.get_env("LIVE_VIEW_SIGNING_SALT") || "kNPzqRSx"]
 
 # Set default signing salt, overridden in runtime.exs
 config :convo_sim, session_signing_salt: "5/hl7WD3"
