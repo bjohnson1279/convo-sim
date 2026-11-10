@@ -1,13 +1,17 @@
 defmodule ConvoSimWeb.DashboardLive do
+  @moduledoc """
+  Real-time Phoenix LiveView dashboard for managing simulated customer conversations.
+
+  Subscribes to PubSub conversation updates, renders streamed conversation cards,
+  and handles user actions including spawning, messaging, and stopping conversations.
+  """
   use ConvoSimWeb, :live_view
 
   require Logger
 
   alias ConvoSim.ConversationManager
 
-  # ⚡ Bolt: Extract static default_messages to a module attribute evaluated at compile-time.
-  # This prevents memory allocation and garbage collection of this list on every `send_message` event.
-  # Converted to a tuple for O(1) random element selection without list traversal.
+  # ⚡ Bolt: Compile-time tuple allows O(1) random message selection without allocations.
   @default_messages {
     "Hello, I need help with my account billing.",
     "Can I change my subscription plan?",
@@ -19,15 +23,12 @@ defmodule ConvoSimWeb.DashboardLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    # Only subscribe if connected to avoid subscribing twice (HTTP mount + WebSocket mount)
+    # Only subscribe if connected to avoid subscribing twice (HTTP mount + WebSocket mount).
     if connected?(socket) do
       Phoenix.PubSub.subscribe(ConvoSim.PubSub, "conversations")
     end
 
-    # Fetch initial active conversations
-    # ⚡ Bolt: Avoid duplicate expensive GenServer state fetches on initial page load
-    # By only loading conversations when the WebSocket is connected, we skip the N+1
-    # process state fetches during the disconnected HTTP render, speeding up time-to-first-byte.
+    # ⚡ Bolt: Defer state fetching until WebSocket connects to reduce time-to-first-byte.
     conversations = if connected?(socket), do: load_conversations(), else: []
 
     {:ok,
@@ -67,7 +68,7 @@ defmodule ConvoSimWeb.DashboardLive do
            )}
 
         {:error, reason} ->
-          # 🛡️ Sentinel: Log internal error to avoid information leakage in UI
+          # 🛡️ Sentinel: Log internal error to avoid information leakage in UI.
           Logger.error("Failed to start conversation: #{inspect(reason)}")
           {:noreply, put_flash(socket, :error, "Failed to start conversation. Please try again.")}
       end
@@ -77,7 +78,7 @@ defmodule ConvoSimWeb.DashboardLive do
   @impl true
   def handle_event("send_message", %{"id" => id}, socket)
       when not is_binary(id) or byte_size(id) > 64 do
-    # 🛡️ Sentinel: Validate input and reject massive identifiers entirely to prevent memory DoS
+    # 🛡️ Sentinel: Validate input and reject massive identifiers to prevent memory DoS.
     Logger.warning("Rejected send_message: ID exceeds maximum length or is invalid type")
     {:noreply, socket}
   end
@@ -110,7 +111,7 @@ defmodule ConvoSimWeb.DashboardLive do
   @impl true
   def handle_event("stop_conversation", %{"id" => id}, socket)
       when not is_binary(id) or byte_size(id) > 64 do
-    # 🛡️ Sentinel: Validate input and reject massive identifiers entirely to prevent memory DoS
+    # 🛡️ Sentinel: Validate input and reject massive identifiers to prevent memory DoS.
     Logger.warning("Rejected stop_conversation: ID exceeds maximum length or is invalid type")
     {:noreply, socket}
   end
@@ -135,18 +136,16 @@ defmodule ConvoSimWeb.DashboardLive do
 
       case ConversationManager.stop_conversation(id) do
         :ok ->
-          # ⚡ Bolt: Clean up dynamically populated rate-limit trackers to prevent
-          # memory leaks in long-running WebSocket connections.
+          # ⚡ Bolt: Prune rate-limit trackers when conversation stops to prevent memory leak.
           socket =
             socket
             |> assign(:last_message_times, Map.delete(socket.assigns.last_message_times, id))
             |> assign(:last_stop_times, Map.delete(socket.assigns.last_stop_times, id))
 
-          # Remove from local stream
           {:noreply, stream_delete_by_id(socket, :conversations, id)}
 
         {:error, reason} ->
-          # 🛡️ Sentinel: Use inspect(id) to prevent log injection from unsanitized input
+          # 🛡️ Sentinel: Sanitize id in log to prevent log injection.
           Logger.error("Failed to stop conversation #{inspect(id)}: #{inspect(reason)}")
 
           {:noreply,
@@ -157,17 +156,15 @@ defmodule ConvoSimWeb.DashboardLive do
 
   @impl true
   def handle_info({:conversation_updated, _id, state}, socket) do
-    # Stream insert automatically adds or updates an item in the stream by its DOM ID
     {:noreply, stream_insert(socket, :conversations, state)}
   end
 
   defp load_conversations do
-    # ⚡ Bolt: Fetch all states natively from ETS in O(1) avoiding N+1 GenServer bottleneck
+    # ⚡ Bolt: Fetch all states natively from ETS in O(1) to avoid N+1 GenServer calls.
     ConversationManager.list_all_states()
   end
 
   defp stream_delete_by_id(socket, stream_name, id) do
-    # Stream delete expects a struct or map with an :id field
     stream_delete(socket, stream_name, %{id: id})
   end
 
