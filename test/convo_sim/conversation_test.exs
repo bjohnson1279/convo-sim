@@ -211,5 +211,62 @@ defmodule ConvoSim.ConversationTest do
       ConversationManager.stop_conversation(id1)
       ConversationManager.stop_conversation(id2)
     end
+
+    test "get_state/1 fallback to GenServer.call raises exit :noproc for nonexistent conversation" do
+      assert {:noproc, _} = catch_exit(Conversation.get_state("conv-doesnotexist"))
+    end
+
+    test "send_message/2 handles boundary edge conditions: empty strings, min/max id lengths" do
+      {:ok, id} = ConversationManager.start_conversation()
+
+      # Empty content (0 bytes) should be accepted as valid binary
+      assert Conversation.send_message(id, "") == :ok
+
+      [{pid, _}] = Registry.lookup(ConvoSim.ConversationRegistry, id)
+      _ = :sys.get_state(pid)
+
+      state = ConversationManager.get_state(id)
+      assert state.message_count == 1
+      assert hd(state.messages).content == ""
+
+      # Boundaries on id length
+      max_id = String.duplicate("x", 64)
+      assert Conversation.send_message(max_id, "Valid content") == :ok
+
+      min_id = "x"
+      assert Conversation.send_message(min_id, "Valid content") == :ok
+
+      ref = Process.monitor(pid)
+      assert ConversationManager.stop_conversation(id) == :ok
+      assert_receive {:DOWN, ^ref, :process, ^pid, _reason}
+    end
+
+    test "end-to-end asynchronous AI task response transitions status back to :idle" do
+      {:ok, id} = ConversationManager.start_conversation()
+      Phoenix.PubSub.subscribe(ConvoSim.PubSub, "conversation:#{id}")
+
+      assert Conversation.send_message(id, "End-to-end test query") == :ok
+
+      # 1. State transitions to :responding
+      assert_receive {:conversation_updated, ^id, %Conversation{status: :responding}}, 1000
+
+      # 2. Background Task completes Simulated responder delay (1-4s) and sends :ai_response back
+      assert_receive {:conversation_updated, ^id,
+                      %Conversation{status: :idle, message_count: 2} = final_state},
+                     6000
+
+      assert final_state.status == :idle
+      assert length(final_state.messages) == 2
+      [ai_msg, cust_msg] = final_state.messages
+      assert cust_msg.role == :customer
+      assert cust_msg.content == "End-to-end test query"
+      assert ai_msg.role == :assistant
+      assert is_binary(ai_msg.content)
+
+      [{pid, _}] = Registry.lookup(ConvoSim.ConversationRegistry, id)
+      ref = Process.monitor(pid)
+      assert ConversationManager.stop_conversation(id) == :ok
+      assert_receive {:DOWN, ^ref, :process, ^pid, _reason}
+    end
   end
 end
