@@ -113,3 +113,7 @@
 ## 2026-11-07 - Extracting Dynamic Configs to Compile-Time Attributes for Performance
 **Learning:** In Elixir, using `Application.get_env/3` inside hot paths or during application startup (e.g., in `Application.start/2`) incurs a small but cumulative ETS lookup overhead for every invocation. If these configuration values are statically defined and do not change dynamically at runtime, fetching them repeatedly is inefficient.
 **Action:** Replace `Application.get_env/3` with module attributes initialized using `Application.compile_env/3`. This bakes the configuration into the module at compile time, completely eliminating the ETS lookup overhead during runtime.
+
+## 2026-11-11 - [System.system_time vs System.monotonic_time in Rate Limiting]
+**Learning:** Using `System.system_time(:millisecond)` for calculating elapsed time durations (like rate limits) is incorrect and inefficient, as it can go backwards due to NTP syncs or leap seconds, and it is a slightly more expensive OS call.
+**Action:** Always use `System.monotonic_time(:millisecond)` when measuring durations, elapsed time, or performing rate-limit checks.
