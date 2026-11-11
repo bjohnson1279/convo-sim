@@ -149,3 +149,10 @@ ole="log"\ and \ria-live="polite"\ on chat message containers to ensure screen 
 ## 2024-11-20 - Add aria-pressed state to theme toggle and enforce button types
 **Learning:** For custom JS toggle groups like theme switchers, screen readers need to know which toggle is currently active. Furthermore, standalone action buttons should always explicitly define `type="button"` to prevent accidental form submission behavior if they ever become wrapped in a `<form>` element.
 **Action:** Use `aria-pressed="true"`/`"false"` bound to the active state for custom toggles, and enforce `type="button"` on all standalone action buttons in the layout and LiveView components.
+## 2024-11-20 - Ensure skip-link targets have correct tabindex
+**Learning:** Adding a "skip to main content" link is useless for screen reader and keyboard-only users if the target element (e.g. `<main id="main-content">`) is not focusable. If the target lacks `tabindex="-1"`, standard keyboard focus will not properly shift to the main content area upon clicking the skip-link.
+**Action:** Always ensure that the destination of a skip-link includes `tabindex="-1"` (and `focus:outline-none` to avoid unexpected focus rings) so the browser shifts programmatic focus correctly.
+
+## 2024-11-20 - Differentiate role and aria-live on Flash Messages
+**Learning:** Hardcoding `role="alert"` and relying on a parent `aria-live="polite"` for all toast/flash messages can cause screen readers to treat informative, non-critical updates with undue urgency, while simultaneously causing critical errors to be announced incorrectly or delayed.
+**Action:** Conditionally apply `role="alert"` and `aria-live="assertive"` ONLY for error/critical flash messages, and use `role="status"` and `aria-live="polite"` for general info messages. Furthermore, remove overarching `aria-live` wrappers that might conflict with the individual message semantics.

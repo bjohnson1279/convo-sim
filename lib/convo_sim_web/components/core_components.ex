@@ -61,7 +61,8 @@ defmodule ConvoSimWeb.CoreComponents do
     <div
       :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
       id={@id}
-      role="alert"
+      role={if @kind == :error, do: "alert", else: "status"}
+      aria-live={if @kind == :error, do: "assertive", else: "polite"}
       class="toast toast-top toast-end z-50"
       {@rest}
     >

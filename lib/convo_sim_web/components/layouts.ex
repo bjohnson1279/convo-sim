@@ -85,7 +85,7 @@ defmodule ConvoSimWeb.Layouts do
       </nav>
     </header>
 
-    <main id="main-content" class="px-4 py-20 sm:px-6 lg:px-8">
+    <main id="main-content" class="px-4 py-20 sm:px-6 lg:px-8 focus:outline-none" tabindex="-1">
       <div class="mx-auto max-w-2xl space-y-4">
         {render_slot(@inner_block)}
       </div>
@@ -106,7 +106,7 @@ defmodule ConvoSimWeb.Layouts do
 
   def flash_group(assigns) do
     ~H"""
-    <div id={@id} aria-live="polite">
+    <div id={@id}>
       <.flash kind={:info} flash={@flash} /> <.flash kind={:error} flash={@flash} />
       <.flash
         id="client-error"
