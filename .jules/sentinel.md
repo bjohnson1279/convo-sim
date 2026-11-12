@@ -166,3 +166,8 @@
 **Vulnerability:** 4-byte random tokens (8 hex characters) provided only 32 bits of entropy, allowing brute-force ID guessing or IDOR attacks in multi-user environments.
 **Learning:** Generating 16 cryptographically secure random bytes (32 hex characters / 128-bit entropy) makes IDs unguessable while maintaining sub-microsecond generation speed.
 **Action:** Use `:crypto.strong_rand_bytes(16)` when generating unique public-facing session/conversation identifiers.
+
+## 2026-11-10 - Secure LiveView Signing Salt Configuration
+**Vulnerability:** The application had a hardcoded `signing_salt` for LiveView in `config/config.exs` (`live_view: [signing_salt: "kNPzqRSx"]`), which would be baked into the production release and allow attackers to forge LiveView socket connections if exposed.
+**Learning:** In Phoenix applications, LiveView signing salts are critical cryptographic materials used to sign socket session tokens. Hardcoding them at compile time in `config/config.exs` is a security risk.
+**Prevention:** Always dynamically fetch the LiveView `signing_salt` from a secure environment variable (e.g., `System.get_env("LIVE_VIEW_SIGNING_SALT")`) in `config/runtime.exs` for production environments.
