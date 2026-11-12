@@ -81,6 +81,30 @@ defmodule ConvoSim.ConversationTest do
       assert ConversationManager.stop_conversation(id) == :ok
       assert_receive {:DOWN, ^ref, :process, ^pid, _reason}
     end
+
+    test "accepts empty string and whitespace messages and min/max id lengths" do
+      {:ok, id} = ConversationManager.start_conversation()
+
+      assert Conversation.send_message(id, "") == :ok
+
+      [{pid, _}] = Registry.lookup(ConvoSim.ConversationRegistry, id)
+      _ = :sys.get_state(pid)
+
+      state = ConversationManager.get_state(id)
+      assert state.message_count == 1
+      assert hd(state.messages).content == ""
+
+      # Boundaries on id length (1 byte and 64 bytes)
+      max_id = String.duplicate("x", 64)
+      assert Conversation.send_message(max_id, "Valid content") == :ok
+
+      min_id = "x"
+      assert Conversation.send_message(min_id, "Valid content") == :ok
+
+      ref = Process.monitor(pid)
+      assert ConversationManager.stop_conversation(id) == :ok
+      assert_receive {:DOWN, ^ref, :process, ^pid, _reason}
+    end
   end
 
   test "enforces maximum concurrent conversation limit of 50" do
@@ -210,6 +234,54 @@ defmodule ConvoSim.ConversationTest do
 
       ConversationManager.stop_conversation(id1)
       ConversationManager.stop_conversation(id2)
+    end
+
+    test "Conversation.get_state falls back to GenServer.call and exits with :noproc when id not in Registry" do
+      # When an ID is not in the registry, get_state attempts GenServer.call to the via tuple
+      # which should exit with :noproc.
+      assert {:noproc, _} =
+               catch_exit(Conversation.get_state("conv-nonexistent-999"))
+    end
+
+    test "ConversationManager.list_conversations returns empty list when no conversations are registered" do
+      # Stop any existing conversations to verify empty state behavior
+      for id <- ConversationManager.list_conversations() do
+        ConversationManager.stop_conversation(id)
+      end
+
+      # Yield to ensure process cleanups propagate to Registry
+      _ = :sys.get_state(ConvoSim.ConversationRegistry)
+
+      assert ConversationManager.list_conversations() == []
+    end
+
+    test "asynchronously completes end-to-end background AI response generation with Simulated responder" do
+      {:ok, id} = ConversationManager.start_conversation()
+      [{pid, _}] = Registry.lookup(ConvoSim.ConversationRegistry, id)
+
+      Phoenix.PubSub.subscribe(ConvoSim.PubSub, "conversation:#{id}")
+
+      assert Conversation.send_message(id, "Test background task execution") == :ok
+      _ = :sys.get_state(pid)
+
+      # Initial transition to responding
+      assert_receive {:conversation_updated, ^id, %Conversation{status: :responding}}, 1000
+
+      # The Simulated responder sleeps 1000..4000ms before sending {:ai_response, response}
+      # Assert the second broadcast is received when background task finishes
+      assert_receive {:conversation_updated, ^id, %Conversation{status: :idle} = finished_state},
+                     6000
+
+      assert finished_state.message_count == 2
+      [latest_reply, first_msg] = finished_state.messages
+      assert latest_reply.role == :assistant
+      assert is_binary(latest_reply.content)
+      assert first_msg.role == :customer
+      assert first_msg.content == "Test background task execution"
+
+      ref = Process.monitor(pid)
+      assert ConversationManager.stop_conversation(id) == :ok
+      assert_receive {:DOWN, ^ref, :process, ^pid, _reason}
     end
   end
 end
