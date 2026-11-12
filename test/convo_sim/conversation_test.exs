@@ -82,7 +82,7 @@ defmodule ConvoSim.ConversationTest do
       assert_receive {:DOWN, ^ref, :process, ^pid, _reason}
     end
 
-    test "accepts empty string and whitespace messages as valid payloads" do
+    test "accepts empty string and whitespace messages and min/max id lengths" do
       {:ok, id} = ConversationManager.start_conversation()
 
       assert Conversation.send_message(id, "") == :ok
@@ -93,6 +93,13 @@ defmodule ConvoSim.ConversationTest do
       state = ConversationManager.get_state(id)
       assert state.message_count == 1
       assert hd(state.messages).content == ""
+
+      # Boundaries on id length (1 byte and 64 bytes)
+      max_id = String.duplicate("x", 64)
+      assert Conversation.send_message(max_id, "Valid content") == :ok
+
+      min_id = "x"
+      assert Conversation.send_message(min_id, "Valid content") == :ok
 
       ref = Process.monitor(pid)
       assert ConversationManager.stop_conversation(id) == :ok
