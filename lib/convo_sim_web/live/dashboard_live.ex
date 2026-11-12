@@ -34,7 +34,7 @@ defmodule ConvoSimWeb.DashboardLive do
     {:ok,
      socket
      |> assign(:page_title, "Conversation Simulator")
-     |> assign(:last_spawn_time, 0)
+     |> assign(:last_spawn_time, -2_000_000_000_000)
      |> assign(:last_message_times, %{})
      |> assign(:last_stop_times, %{})
      |> stream(:conversations, conversations)}
@@ -42,7 +42,7 @@ defmodule ConvoSimWeb.DashboardLive do
 
   @impl true
   def handle_event("spawn_conversation", _params, socket) do
-    now = System.system_time(:millisecond)
+    now = System.monotonic_time(:millisecond)
     last_spawn = socket.assigns.last_spawn_time
 
     if now - last_spawn < 1000 do
@@ -85,8 +85,8 @@ defmodule ConvoSimWeb.DashboardLive do
 
   @impl true
   def handle_event("send_message", %{"id" => id}, socket) do
-    now = System.system_time(:millisecond)
-    last_msg = Map.get(socket.assigns.last_message_times, id, 0)
+    now = System.monotonic_time(:millisecond)
+    last_msg = Map.get(socket.assigns.last_message_times, id, -2_000_000_000_000)
 
     if now - last_msg < 1000 do
       Logger.warning("Rate limit exceeded for send_message on conversation #{inspect(id)}")
@@ -118,8 +118,8 @@ defmodule ConvoSimWeb.DashboardLive do
 
   @impl true
   def handle_event("stop_conversation", %{"id" => id}, socket) do
-    now = System.system_time(:millisecond)
-    last_stop = Map.get(socket.assigns.last_stop_times, id, 0)
+    now = System.monotonic_time(:millisecond)
+    last_stop = Map.get(socket.assigns.last_stop_times, id, -2_000_000_000_000)
 
     if now - last_stop < 1000 do
       Logger.warning("Rate limit exceeded for stop_conversation on conversation #{inspect(id)}")
